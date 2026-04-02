@@ -11,3 +11,7 @@ include:
   - path: compose/tunnel.yml
   - path: compose/debug.yml
   - path: compose/test.yml
+
+networks:
+  workshop:
+    name: workshop

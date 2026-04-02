@@ -29,6 +29,3 @@ services:
       - "traefik.http.routers.ngrok.tls=true"
       - "traefik.http.services.ngrok.loadbalancer.server.port=4040"
 
-networks:
-  workshop:
-    external: true

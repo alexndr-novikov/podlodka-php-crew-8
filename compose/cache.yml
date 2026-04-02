@@ -15,6 +15,3 @@ services:
 volumes:
   valkey-data:
 
-networks:
-  workshop:
-    external: true

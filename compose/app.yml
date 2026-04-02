@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: .
+      context: ..
       dockerfile: docker/frankenphp/Dockerfile
       target: dev
     restart: unless-stopped
@@ -28,7 +28,7 @@ services:
       XDEBUG_MODE: ${XDEBUG_MODE:-off}
       FRANKENPHP_WORKER_CONFIG: watch
     volumes:
-      - ./:/app
+      - ../:/app
       - caddy-data:/data
       - caddy-config:/config
     networks:
@@ -47,24 +47,24 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./src
+          path: ../src
           target: /app/src
           ignore:
             - "*.test.php"
         - action: sync
-          path: ./templates
+          path: ../templates
           target: /app/templates
         - action: sync
-          path: ./config
+          path: ../config
           target: /app/config
         - action: rebuild
-          path: ./composer.json
+          path: ../composer.json
         - action: rebuild
-          path: ./composer.lock
+          path: ../composer.lock
 
   worker-messenger:
     build:
-      context: .
+      context: ..
       dockerfile: docker/frankenphp/Dockerfile
       target: dev
     restart: unless-stopped
@@ -86,7 +86,7 @@ services:
       OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL:-http/protobuf}
       OTEL_SERVICE_NAME: workshop-messenger-worker
     volumes:
-      - ./:/app
+      - ../:/app
     networks:
       - workshop
     depends_on:
@@ -99,6 +99,3 @@ volumes:
   caddy-data:
   caddy-config:
 
-networks:
-  workshop:
-    external: true

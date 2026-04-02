@@ -16,6 +16,3 @@ services:
       - "traefik.http.routers.mailpit.tls=true"
       - "traefik.http.services.mailpit.loadbalancer.server.port=8025"
 
-networks:
-  workshop:
-    external: true

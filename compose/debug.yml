@@ -13,6 +13,3 @@ services:
       - "traefik.http.routers.buggregator.tls=true"
       - "traefik.http.services.buggregator.loadbalancer.server.port=8000"
 
-networks:
-  workshop:
-    external: true

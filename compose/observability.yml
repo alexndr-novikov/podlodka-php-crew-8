@@ -11,6 +11,3 @@ services:
       - "traefik.http.routers.grafana.tls=true"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
-networks:
-  workshop:
-    external: true

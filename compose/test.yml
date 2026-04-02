@@ -8,6 +8,3 @@ services:
       - test
     shm_size: "2g"
 
-networks:
-  workshop:
-    external: true
