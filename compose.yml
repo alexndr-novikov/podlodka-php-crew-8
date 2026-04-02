@@ -1,0 +1,13 @@
+include:
+  - path: compose/proxy.yml
+  - path: compose/database.yml
+  - path: compose/cache.yml
+  - path: compose/search.yml
+  - path: compose/mail.yml
+  - path: compose/storage.yml
+  - path: compose/temporal.yml
+  - path: compose/observability.yml
+  - path: compose/app.yml
+  - path: compose/tunnel.yml
+  - path: compose/debug.yml
+  - path: compose/test.yml
