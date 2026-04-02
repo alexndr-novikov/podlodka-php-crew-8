@@ -1,0 +1,20 @@
+services:
+  valkey:
+    image: valkey/valkey:8
+    restart: unless-stopped
+    volumes:
+      - valkey-data:/data
+    networks:
+      - workshop
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  valkey-data:
+
+networks:
+  workshop:
+    external: true
