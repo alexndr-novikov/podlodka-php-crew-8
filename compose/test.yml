@@ -1,0 +1,13 @@
+services:
+  selenium:
+    image: selenium/standalone-chrome:latest
+    restart: unless-stopped
+    networks:
+      - workshop
+    profiles:
+      - test
+    shm_size: "2g"
+
+networks:
+  workshop:
+    external: true

@@ -1,0 +1,29 @@
+services:
+  meilisearch:
+    image: getmeili/meilisearch:v1
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-workshop-meili-key}
+      MEILI_ENV: development
+    volumes:
+      - meilisearch-data:/meili_data
+    networks:
+      - workshop
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.meilisearch.rule=Host(`search.workshop.localhost`)"
+      - "traefik.http.routers.meilisearch.entrypoints=websecure"
+      - "traefik.http.routers.meilisearch.tls=true"
+      - "traefik.http.services.meilisearch.loadbalancer.server.port=7700"
+
+volumes:
+  meilisearch-data:
+
+networks:
+  workshop:
+    external: true

@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vscode
+.env.local
+docker/traefik/certs
+node_modules
+var
+docs
+old
+*.md
+!README.md

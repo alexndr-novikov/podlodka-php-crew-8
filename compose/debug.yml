@@ -1,0 +1,18 @@
+services:
+  buggregator:
+    image: ghcr.io/buggregator/server:latest
+    restart: unless-stopped
+    networks:
+      - workshop
+    profiles:
+      - debug
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.buggregator.rule=Host(`debug.workshop.localhost`)"
+      - "traefik.http.routers.buggregator.entrypoints=websecure"
+      - "traefik.http.routers.buggregator.tls=true"
+      - "traefik.http.services.buggregator.loadbalancer.server.port=8000"
+
+networks:
+  workshop:
+    external: true

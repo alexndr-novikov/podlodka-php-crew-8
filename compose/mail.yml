@@ -1,0 +1,21 @@
+services:
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    networks:
+      - workshop
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8025/livez"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailpit.rule=Host(`mailpit.workshop.localhost`)"
+      - "traefik.http.routers.mailpit.entrypoints=websecure"
+      - "traefik.http.routers.mailpit.tls=true"
+      - "traefik.http.services.mailpit.loadbalancer.server.port=8025"
+
+networks:
+  workshop:
+    external: true
