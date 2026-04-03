@@ -25,7 +25,6 @@ make up      # запуск всех сервисов
 | Mailpit | https://mailpit.workshop.localhost:8443 | Тестирование email |
 | Grafana | https://grafana.workshop.localhost:8443 | Логи, трейсы, метрики |
 | Meilisearch | https://search.workshop.localhost:8443 | Полнотекстовый поиск |
-| Temporal UI | https://temporal.workshop.localhost:8443 | Управление workflow |
 | Traefik | https://traefik.workshop.localhost:8443/dashboard/ | Маршрутизация |
 
 > Порты 80/443 можно изменить через `HTTP_PORT` / `HTTPS_PORT` в `.env`.
@@ -41,7 +40,6 @@ make up      # запуск всех сервисов
 | Поиск | Meilisearch v1 |
 | Почта | Mailpit |
 | Объектное хранилище | LocalStack (S3) |
-| Workflow engine | Temporal |
 | Observability | Grafana LGTM (OTel Collector + Loki + Tempo + Mimir) |
 
 ## Опциональные сервисы (profiles)
@@ -78,7 +76,6 @@ compose/
   search.yml                 <- Meilisearch
   mail.yml                   <- Mailpit
   storage.yml                <- LocalStack (S3)
-  temporal.yml               <- Temporal server + UI + PHP worker
   observability.yml          <- Grafana LGTM
   tunnel.yml                 <- Cloudflare / ngrok (profile)
   debug.yml                  <- Buggregator (profile)

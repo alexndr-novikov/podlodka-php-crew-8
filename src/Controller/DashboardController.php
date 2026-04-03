@@ -45,14 +45,6 @@ class DashboardController extends AbstractController
                 'serviceUrl' => null,
             ],
             [
-                'title' => 'Workflows',
-                'description' => 'Temporal workflow engine',
-                'route' => 'workflow_index',
-                'icon' => "\u{1F504}",
-                'service' => 'Temporal',
-                'serviceUrl' => 'https://temporal.workshop.localhost:8443',
-            ],
-            [
                 'title' => 'Webhooks',
                 'description' => 'Приём вебхуков через Cloudflare Tunnel',
                 'route' => 'webhook_index',
