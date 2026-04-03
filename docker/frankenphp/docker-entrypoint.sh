@@ -11,7 +11,11 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
     if [ -n "$DATABASE_URL" ]; then
         echo "Waiting for database..."
         timeout=30
-        while ! php -r "try { new PDO('$DATABASE_URL'); echo 'ok'; } catch (\Exception \$e) { exit(1); }" 2>/dev/null; do
+        while ! php -r "
+            \$url = parse_url('$DATABASE_URL');
+            \$dsn = 'pgsql:host=' . \$url['host'] . ';port=' . (\$url['port'] ?? 5432) . ';dbname=' . ltrim(\$url['path'], '/');
+            try { new PDO(\$dsn, \$url['user'], \$url['pass']); echo 'ok'; } catch (\Exception \$e) { exit(1); }
+        " 2>/dev/null; do
             timeout=$((timeout - 1))
             if [ $timeout -le 0 ]; then
                 echo "Database connection timeout"
@@ -21,8 +25,8 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
         done
     fi
 
-    # Run migrations in dev
-    if [ "$APP_ENV" = "dev" ]; then
+    # Run migrations in dev (only if Doctrine is installed)
+    if [ "$APP_ENV" = "dev" ] && php bin/console list doctrine:migrations 2>/dev/null | grep -q migrate; then
         php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration 2>/dev/null || true
     fi
 fi
