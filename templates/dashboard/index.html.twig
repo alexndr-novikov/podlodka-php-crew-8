@@ -15,9 +15,10 @@
                 <h3 class="text-lg font-semibold text-gray-900">{{ demo.title }}</h3>
                 <p class="mt-2 text-sm text-gray-500">{{ demo.description }}</p>
                 <div class="mt-4 flex items-center justify-between">
-                    <span class="text-sm font-medium text-indigo-600">
+                    <a href="{{ path(demo.route) }}"
+                       class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                         Открыть →
-                    </span>
+                    </a>
                     {% if demo.serviceUrl %}
                         <a href="{{ demo.serviceUrl }}"
                            target="_blank"

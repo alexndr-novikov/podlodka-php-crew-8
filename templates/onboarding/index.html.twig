@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Onboarding — Docker Workshop{% endblock %}
+
+{% block body %}
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Onboarding</h1>
+        <p class="mt-1 text-gray-500">Сквозной сценарий: PostgreSQL + S3 + Meilisearch + Messenger + Mailpit</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold mb-4">Регистрация пользователя</h2>
+            <form method="post" action="{{ path('onboarding_register') }}" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Имя</label>
+                    <input type="text" name="name" id="name" required placeholder="Алексей Иванов"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" required placeholder="alexey@example.com"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                </div>
+                <div>
+                    <label for="avatar" class="block text-sm font-medium text-gray-700">Аватар (опционально)</label>
+                    <input type="file" name="avatar" id="avatar" accept="image/*"
+                           class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                </div>
+                <button type="submit"
+                        class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                    Зарегистрировать
+                </button>
+            </form>
+        </div>
+
+        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold mb-4">Что произойдёт</h2>
+            <ol class="space-y-3 text-sm text-gray-600">
+                <li class="flex gap-2">
+                    <span class="font-bold text-indigo-600">1.</span>
+                    <span>User сохраняется в <strong>PostgreSQL</strong> (Doctrine ORM)</span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="font-bold text-indigo-600">2.</span>
+                    <span>Аватар загружается в <strong>S3</strong> (Flysystem + LocalStack)</span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="font-bold text-indigo-600">3.</span>
+                    <span>Профиль индексируется в <strong>Meilisearch</strong></span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="font-bold text-indigo-600">4.</span>
+                    <span>Welcome email отправляется async через <strong>Messenger</strong> + <strong>Valkey</strong></span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="font-bold text-indigo-600">5.</span>
+                    <span>Результат виден в <strong>Mailpit</strong></span>
+                </li>
+            </ol>
+            <div class="mt-4 space-y-1">
+                <a href="https://mailpit.workshop.localhost:8443" target="_blank"
+                   class="block text-sm text-indigo-600 hover:text-indigo-500">Mailpit UI</a>
+                <a href="https://search.workshop.localhost:8443" target="_blank"
+                   class="block text-sm text-indigo-600 hover:text-indigo-500">Meilisearch</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
