@@ -3,42 +3,38 @@
 {% block title %}Cache — Docker Workshop{% endblock %}
 
 {% block body %}
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Cache (Valkey)</h1>
-        <p class="mt-1 text-gray-500">Операции с Valkey (Redis-compatible key-value store)</p>
+    <div class="mb-8">
+        <h1 class="section-title text-3xl gradient-text">Cache (Valkey)</h1>
+        <p class="section-subtitle">Операции с Valkey (Redis-compatible key-value store)</p>
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-semibold mb-4">Set</h2>
+        <div class="glass-card p-6">
+            <h2 class="text-lg font-semibold text-pod-text font-display mb-5">Set</h2>
             <form method="post" action="{{ path('cache_set') }}" class="space-y-3">
-                <input type="text" name="key" placeholder="Key" value="test"
-                       class="block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border">
-                <input type="text" name="value" placeholder="Value" value="hello"
-                       class="block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border">
-                <input type="number" name="ttl" placeholder="TTL (seconds)" value="60"
-                       class="block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border">
-                <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Set</button>
+                <input type="text" name="key" placeholder="Key" value="test" class="pod-input">
+                <input type="text" name="value" placeholder="Value" value="hello" class="pod-input">
+                <input type="number" name="ttl" placeholder="TTL (seconds)" value="60" class="pod-input">
+                <button type="submit" class="pod-btn pod-btn-primary">Set</button>
             </form>
         </div>
 
-        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-semibold mb-4">Get / Delete</h2>
+        <div class="glass-card p-6">
+            <h2 class="text-lg font-semibold text-pod-text font-display mb-5">Get / Delete</h2>
             <form method="post" action="{{ path('cache_get') }}" class="space-y-3">
-                <input type="text" name="key" placeholder="Key" value="test"
-                       class="block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border">
-                <div class="flex gap-2">
-                    <button type="submit" class="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">Get</button>
-                    <button type="submit" formaction="{{ path('cache_delete') }}" class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">Delete</button>
+                <input type="text" name="key" placeholder="Key" value="test" class="pod-input">
+                <div class="flex gap-3">
+                    <button type="submit" class="pod-btn pod-btn-success">Get</button>
+                    <button type="submit" formaction="{{ path('cache_delete') }}" class="pod-btn pod-btn-danger">Delete</button>
                 </div>
             </form>
         </div>
 
-        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-semibold mb-4">Benchmark</h2>
-            <p class="text-sm text-gray-500 mb-4">1000 write + 1000 read операций</p>
+        <div class="glass-card p-6">
+            <h2 class="text-lg font-semibold text-pod-text font-display mb-5">Benchmark</h2>
+            <p class="text-sm text-pod-text-muted mb-4">1000 write + 1000 read операций</p>
             <form method="post" action="{{ path('cache_benchmark') }}">
-                <button type="submit" class="rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-500">Run Benchmark</button>
+                <button type="submit" class="pod-btn pod-btn-amber">Run Benchmark</button>
             </form>
         </div>
     </div>

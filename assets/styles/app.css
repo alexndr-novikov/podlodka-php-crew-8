@@ -1,1 +1,423 @@
 @import "tailwindcss";
+
+@theme {
+    /* Podlodka Brand Palette */
+    --color-pod-purple: #7B2FFF;
+    --color-pod-purple-light: #9B5FFF;
+    --color-pod-blue: #2B6FED;
+    --color-pod-green: #00E676;
+    --color-pod-green-light: #69F0AE;
+
+    /* Dark Theme */
+    --color-pod-bg: #08080F;
+    --color-pod-bg-raised: #10101C;
+    --color-pod-bg-card: #14142A;
+    --color-pod-border: rgba(123, 47, 255, 0.15);
+    --color-pod-border-hover: rgba(123, 47, 255, 0.35);
+    --color-pod-text: #E8E8F0;
+    --color-pod-text-muted: #8888A8;
+    --color-pod-text-dim: #55556E;
+
+    /* Fonts */
+    --font-display: 'Unbounded', sans-serif;
+    --font-body: 'Onest', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ─── Base ─── */
+
+html {
+    font-family: var(--font-body);
+    background: var(--color-pod-bg);
+    color: var(--color-pod-text);
+}
+
+/* Noise texture overlay */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+}
+
+body > *:not(.sf-toolbar-block):not([class^="sf-"]) {
+    position: relative;
+    z-index: 1;
+}
+
+/* ─── Gradient Utilities ─── */
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--color-pod-purple) 0%, var(--color-pod-blue) 50%, var(--color-pod-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-border {
+    position: relative;
+}
+
+.gradient-border::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--color-pod-purple), var(--color-pod-blue), var(--color-pod-green));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, var(--color-pod-purple), var(--color-pod-blue), var(--color-pod-green));
+}
+
+.gradient-btn {
+    background: linear-gradient(135deg, var(--color-pod-purple) 0%, var(--color-pod-blue) 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(123, 47, 255, 0.25);
+}
+
+.gradient-btn:hover {
+    box-shadow: 0 0 30px rgba(123, 47, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+/* ─── Glass Card ─── */
+
+.glass-card {
+    background: linear-gradient(145deg, rgba(20, 20, 42, 0.8), rgba(16, 16, 28, 0.6));
+    border: 1px solid var(--color-pod-border);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    border-color: var(--color-pod-border-hover);
+    box-shadow:
+        0 0 40px rgba(123, 47, 255, 0.08),
+        0 8px 32px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* ─── Nav Glass ─── */
+
+.nav-glass {
+    background: rgba(8, 8, 15, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--color-pod-border);
+}
+
+/* ─── Glow Effects ─── */
+
+.glow-purple {
+    box-shadow: 0 0 40px rgba(123, 47, 255, 0.15);
+}
+
+.glow-green {
+    box-shadow: 0 0 40px rgba(0, 230, 118, 0.12);
+}
+
+/* ─── Form Inputs ─── */
+
+.pod-input {
+    background: rgba(20, 20, 42, 0.6);
+    border: 1px solid var(--color-pod-border);
+    border-radius: 10px;
+    padding: 0.6rem 0.85rem;
+    color: var(--color-pod-text);
+    font-family: var(--font-body);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.pod-input:focus {
+    outline: none;
+    border-color: var(--color-pod-purple);
+    box-shadow: 0 0 0 3px rgba(123, 47, 255, 0.15);
+}
+
+.pod-input::placeholder {
+    color: var(--color-pod-text-dim);
+}
+
+.pod-input-file {
+    color: var(--color-pod-text-muted);
+}
+
+.pod-input-file::file-selector-button {
+    background: linear-gradient(135deg, rgba(123, 47, 255, 0.2), rgba(43, 111, 237, 0.2));
+    border: 1px solid var(--color-pod-border);
+    border-radius: 8px;
+    padding: 0.4rem 1rem;
+    color: var(--color-pod-purple-light);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-right: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.pod-input-file::file-selector-button:hover {
+    background: linear-gradient(135deg, rgba(123, 47, 255, 0.3), rgba(43, 111, 237, 0.3));
+    border-color: var(--color-pod-border-hover);
+}
+
+/* ─── Code Blocks ─── */
+
+.pod-code {
+    background: rgba(123, 47, 255, 0.08);
+    border: 1px solid rgba(123, 47, 255, 0.12);
+    border-radius: 6px;
+    padding: 0.15rem 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-pod-purple-light);
+}
+
+.pod-code-block {
+    background: rgba(8, 8, 15, 0.8);
+    border: 1px solid var(--color-pod-border);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-pod-green-light);
+    margin-top: 0.35rem;
+}
+
+/* ─── Flash Messages ─── */
+
+.flash-success {
+    background: rgba(0, 230, 118, 0.1);
+    border: 1px solid rgba(0, 230, 118, 0.25);
+    color: var(--color-pod-green-light);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.flash-error {
+    background: rgba(255, 71, 87, 0.1);
+    border: 1px solid rgba(255, 71, 87, 0.25);
+    color: #ff8a94;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+/* ─── Section Headers ─── */
+
+.section-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+    color: var(--color-pod-text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.35rem;
+}
+
+/* ─── Dashboard Cards ─── */
+
+.dash-card {
+    animation: card-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.dash-card:nth-child(1) { animation-delay: 0.05s; }
+.dash-card:nth-child(2) { animation-delay: 0.1s; }
+.dash-card:nth-child(3) { animation-delay: 0.15s; }
+.dash-card:nth-child(4) { animation-delay: 0.2s; }
+.dash-card:nth-child(5) { animation-delay: 0.25s; }
+.dash-card:nth-child(6) { animation-delay: 0.3s; }
+.dash-card:nth-child(7) { animation-delay: 0.35s; }
+.dash-card:nth-child(8) { animation-delay: 0.4s; }
+
+@keyframes card-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Icon Glow ─── */
+
+.icon-glow {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, rgba(123, 47, 255, 0.12), rgba(43, 111, 237, 0.08));
+    border: 1px solid rgba(123, 47, 255, 0.1);
+}
+
+/* ─── Links ─── */
+
+.pod-link {
+    color: var(--color-pod-purple-light);
+    transition: color 0.2s ease;
+    text-decoration: none;
+}
+
+.pod-link:hover {
+    color: var(--color-pod-green-light);
+}
+
+/* ─── Buttons ─── */
+
+.pod-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 10px;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.pod-btn-primary {
+    background: linear-gradient(135deg, var(--color-pod-purple) 0%, var(--color-pod-blue) 100%);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(123, 47, 255, 0.2);
+}
+
+.pod-btn-primary:hover {
+    box-shadow: 0 0 30px rgba(123, 47, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.pod-btn-success {
+    background: linear-gradient(135deg, #00C853, #00E676);
+    color: #08080F;
+    box-shadow: 0 0 20px rgba(0, 230, 118, 0.15);
+}
+
+.pod-btn-success:hover {
+    box-shadow: 0 0 30px rgba(0, 230, 118, 0.35);
+    transform: translateY(-1px);
+}
+
+.pod-btn-danger {
+    background: linear-gradient(135deg, #FF1744, #FF5252);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(255, 23, 68, 0.15);
+}
+
+.pod-btn-danger:hover {
+    box-shadow: 0 0 30px rgba(255, 23, 68, 0.35);
+    transform: translateY(-1px);
+}
+
+.pod-btn-amber {
+    background: linear-gradient(135deg, #FF8F00, #FFB300);
+    color: #08080F;
+    box-shadow: 0 0 20px rgba(255, 143, 0, 0.15);
+}
+
+.pod-btn-amber:hover {
+    box-shadow: 0 0 30px rgba(255, 143, 0, 0.35);
+    transform: translateY(-1px);
+}
+
+.pod-btn-ghost {
+    background: rgba(123, 47, 255, 0.08);
+    border: 1px solid var(--color-pod-border);
+    color: var(--color-pod-purple-light);
+}
+
+.pod-btn-ghost:hover {
+    background: rgba(123, 47, 255, 0.15);
+    border-color: var(--color-pod-border-hover);
+}
+
+/* ─── Data List ─── */
+
+.pod-dl dt {
+    color: var(--color-pod-text-muted);
+}
+
+.pod-dl dd {
+    color: var(--color-pod-text);
+}
+
+.pod-dl .pod-mono {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-pod-green-light);
+}
+
+/* ─── Hero Mesh Gradient ─── */
+
+.hero-gradient {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-gradient::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -25%;
+    width: 150%;
+    height: 200%;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(123, 47, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(43, 111, 237, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 80%, rgba(0, 230, 118, 0.06) 0%, transparent 50%);
+    animation: mesh-drift 15s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes mesh-drift {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(-3%, 2%) rotate(2deg); }
+}
+
+/* ─── Scrollbar ─── */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-pod-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(123, 47, 255, 0.25);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(123, 47, 255, 0.4);
+}
+
+/* ─── Ensure Symfony toolbar is not affected ─── */
+
+.sf-toolbar-block,
+div[class^="sf-toolbar"],
+div[id^="sfwdt"] {
+    color: initial;
+    font-family: initial;
+}

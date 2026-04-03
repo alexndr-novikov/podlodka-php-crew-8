@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="ru" class="h-full bg-gray-50">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Docker Workshop{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Onest:wght@300;400;500;600;700&family=Unbounded:wght@400;600;700;800&display=swap" rel="stylesheet">
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
     {% endblock %}
@@ -11,25 +14,25 @@
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     {% endblock %}
 </head>
-<body class="h-full">
-    <nav class="bg-indigo-600 shadow-lg">
+<body class="min-h-screen flex flex-col">
+    <nav class="nav-glass sticky top-0 z-50">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-16 items-center justify-between">
-                <a href="{{ path('dashboard') }}" class="text-white font-bold text-lg">
-                    Docker Workshop
+                <a href="{{ path('dashboard') }}" class="font-display font-bold text-lg gradient-text tracking-tight">
+                    Podlodka Workshop
                 </a>
-                <div class="flex space-x-4">
-                    <a href="{{ path('dashboard') }}" class="text-indigo-100 hover:text-white text-sm">Dashboard</a>
-                    <a href="/api/doc" class="text-indigo-100 hover:text-white text-sm" target="_blank">API Docs</a>
+                <div class="flex items-center gap-5">
+                    <a href="{{ path('dashboard') }}" class="text-pod-text-muted hover:text-pod-purple-light text-sm font-medium transition-colors duration-200">Dashboard</a>
+                    <a href="/api/doc" class="text-pod-text-muted hover:text-pod-purple-light text-sm font-medium transition-colors duration-200" target="_blank">API Docs</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <main class="mx-auto max-w-7xl w-full px-4 py-8 sm:px-6 lg:px-8 flex-1">
         {% for label, messages in app.flashes %}
             {% for message in messages %}
-                <div class="mb-4 rounded-md p-4 {{ label == 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800' }}">
+                <div class="mb-6 {{ label == 'success' ? 'flash-success' : 'flash-error' }}">
                     {{ message }}
                 </div>
             {% endfor %}
@@ -38,8 +41,10 @@
         {% block body %}{% endblock %}
     </main>
 
-    <footer class="mt-auto py-4 text-center text-sm text-gray-400">
-        Podlodka PHP Crew 8 — Docker Workshop
+    <footer class="py-6 text-center text-sm text-pod-text-dim">
+        <span class="gradient-text font-display font-semibold">Podlodka PHP Crew 8</span>
+        <span class="mx-2 text-pod-text-dim">&mdash;</span>
+        <span>Docker Workshop</span>
     </footer>
 </body>
 </html>

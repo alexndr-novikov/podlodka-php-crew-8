@@ -3,70 +3,73 @@
 {% block title %}Webhooks — Docker Workshop{% endblock %}
 
 {% block body %}
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Webhooks</h1>
-        <p class="mt-1 text-gray-500">Приём вебхуков через Cloudflare Tunnel с полным roundtrip</p>
+    <div class="mb-8">
+        <h1 class="section-title text-3xl gradient-text">Webhooks</h1>
+        <p class="section-subtitle">Приём вебхуков через Cloudflare Tunnel с полным roundtrip</p>
     </div>
 
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div class="space-y-6">
-            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-semibold mb-4">Roundtrip Test</h2>
-                <p class="text-sm text-gray-500 mb-4">
+            <div class="glass-card p-6">
+                <h2 class="text-lg font-semibold text-pod-text font-display mb-4">Roundtrip Test</h2>
+                <p class="text-sm text-pod-text-muted mb-4">
                     Отправляет POST через публичный tunnel URL обратно на этот сервер.
-                    Требует запущенный tunnel: <code class="bg-gray-100 px-1 rounded">make tunnel</code>
+                    Требует запущенный tunnel: <code class="pod-code">make tunnel</code>
                 </p>
-                <form method="post" action="{{ path('webhook_send_test') }}" class="space-y-3">
+                <form method="post" action="{{ path('webhook_send_test') }}" class="space-y-4">
                     <div>
-                        <label for="tunnel_url" class="block text-sm font-medium text-gray-700">Tunnel URL</label>
+                        <label for="tunnel_url" class="block text-sm font-medium text-pod-text-muted mb-1.5">Tunnel URL</label>
                         <input type="url" name="tunnel_url" id="tunnel_url"
                                placeholder="https://xxx-yyy.trycloudflare.com"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
-                        <p class="mt-1 text-xs text-gray-400">Скопируйте URL из логов cloudflared: <code>docker compose --profile tunnel logs cloudflared</code></p>
+                               class="pod-input">
+                        <p class="mt-1.5 text-xs text-pod-text-dim">Скопируйте URL из логов cloudflared: <code class="pod-code">docker compose --profile tunnel logs cloudflared</code></p>
                     </div>
-                    <button type="submit"
-                            class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
-                        Send Test Webhook
-                    </button>
+                    <button type="submit" class="pod-btn pod-btn-primary">Send Test Webhook</button>
                 </form>
             </div>
 
-            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-semibold mb-4">Endpoints</h2>
-                <dl class="space-y-3 text-sm">
+            <div class="glass-card p-6">
+                <h2 class="text-lg font-semibold text-pod-text font-display mb-4">Endpoints</h2>
+                <dl class="space-y-4 text-sm">
                     <div>
-                        <dt class="font-medium text-gray-700">POST /webhook/test</dt>
-                        <dd class="text-gray-500">Echo endpoint — возвращает полученный payload</dd>
+                        <dt class="font-medium text-pod-text font-mono text-xs">POST /webhook/test</dt>
+                        <dd class="text-pod-text-muted mt-0.5">Echo endpoint — возвращает полученный payload</dd>
                     </div>
                     <div>
-                        <dt class="font-medium text-gray-700">POST /webhook/stripe</dt>
-                        <dd class="text-gray-500">Имитация Stripe webhook — диспатчит в Messenger</dd>
+                        <dt class="font-medium text-pod-text font-mono text-xs">POST /webhook/stripe</dt>
+                        <dd class="text-pod-text-muted mt-0.5">Имитация Stripe webhook — диспатчит в Messenger</dd>
                     </div>
                 </dl>
             </div>
         </div>
 
-        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm h-fit">
-            <h2 class="text-lg font-semibold mb-4">Как использовать</h2>
-            <ol class="space-y-3 text-sm text-gray-600">
-                <li>
-                    <span class="font-medium text-gray-900">1.</span>
-                    Запустите tunnel:
-                    <code class="block mt-1 bg-gray-100 px-2 py-1 rounded text-xs">make tunnel</code>
+        <div class="glass-card p-6 h-fit">
+            <h2 class="text-lg font-semibold text-pod-text font-display mb-5">Как использовать</h2>
+            <ol class="space-y-4 text-sm text-pod-text-muted">
+                <li class="flex gap-3">
+                    <span class="font-bold text-pod-purple-light font-display">1.</span>
+                    <div>
+                        Запустите tunnel:
+                        <div class="pod-code-block">make tunnel</div>
+                    </div>
                 </li>
-                <li>
-                    <span class="font-medium text-gray-900">2.</span>
-                    Скопируйте URL из логов:
-                    <code class="block mt-1 bg-gray-100 px-2 py-1 rounded text-xs">docker compose --profile tunnel logs cloudflared</code>
+                <li class="flex gap-3">
+                    <span class="font-bold text-pod-purple-light font-display">2.</span>
+                    <div>
+                        Скопируйте URL из логов:
+                        <div class="pod-code-block">docker compose --profile tunnel logs cloudflared</div>
+                    </div>
                 </li>
-                <li>
-                    <span class="font-medium text-gray-900">3.</span>
-                    Вставьте URL выше и нажмите Send
+                <li class="flex gap-3">
+                    <span class="font-bold text-pod-purple-light font-display">3.</span>
+                    <span>Вставьте URL выше и нажмите Send</span>
                 </li>
-                <li>
-                    <span class="font-medium text-gray-900">4.</span>
-                    Проверьте логи:
-                    <code class="block mt-1 bg-gray-100 px-2 py-1 rounded text-xs">docker compose logs app | grep webhook</code>
+                <li class="flex gap-3">
+                    <span class="font-bold text-pod-purple-light font-display">4.</span>
+                    <div>
+                        Проверьте логи:
+                        <div class="pod-code-block">docker compose logs app | grep webhook</div>
+                    </div>
                 </li>
             </ol>
         </div>
