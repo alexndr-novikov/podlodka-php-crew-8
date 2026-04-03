@@ -1,6 +1,6 @@
 services:
   selenium:
-    image: selenium/standalone-chrome:latest
+    image: selenium/standalone-chrome:4
     restart: unless-stopped
     networks:
       - workshop

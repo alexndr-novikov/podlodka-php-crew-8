@@ -1,6 +1,6 @@
 services:
   buggregator:
-    image: ghcr.io/buggregator/server:latest
+    image: ghcr.io/buggregator/server:1
     restart: unless-stopped
     networks:
       - workshop

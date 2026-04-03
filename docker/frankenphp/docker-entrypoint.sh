@@ -12,7 +12,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
         echo "Waiting for database..."
         timeout=30
         while ! php -r "
-            \$url = parse_url('$DATABASE_URL');
+            \$url = parse_url(getenv('DATABASE_URL'));
             \$dsn = 'pgsql:host=' . \$url['host'] . ';port=' . (\$url['port'] ?? 5432) . ';dbname=' . ltrim(\$url['path'], '/');
             try { new PDO(\$dsn, \$url['user'], \$url['pass']); echo 'ok'; } catch (\Exception \$e) { exit(1); }
         " 2>/dev/null; do

@@ -55,6 +55,10 @@ class StorageController extends AbstractController
     #[Route('/delete/{path}', name: 'storage_delete', methods: ['POST'], requirements: ['path' => '.+'])]
     public function delete(string $path): Response
     {
+        if (str_contains($path, '..')) {
+            throw $this->createNotFoundException();
+        }
+
         $this->defaultStorage->delete($path);
         $this->addFlash('success', sprintf('Deleted: %s', $path));
         return $this->redirectToRoute('storage_index');

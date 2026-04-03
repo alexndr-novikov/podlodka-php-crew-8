@@ -40,6 +40,12 @@ class OnboardingController extends AbstractController
             return $this->redirectToRoute('onboarding_index');
         }
 
+        $existing = $em->getRepository(User::class)->findOneBy(['email' => $email]);
+        if ($existing) {
+            $this->addFlash('error', sprintf('User with email %s already exists', $email));
+            return $this->redirectToRoute('onboarding_index');
+        }
+
         // 1. Save user to PostgreSQL
         $user = new User();
         $user->setName($name);

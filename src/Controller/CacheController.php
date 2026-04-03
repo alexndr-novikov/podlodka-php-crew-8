@@ -15,6 +15,7 @@ class CacheController extends AbstractController
 {
     public function __construct(
         private readonly CacheInterface $cache,
+        private readonly \Psr\Cache\CacheItemPoolInterface $cachePool,
     ) {
     }
 
@@ -49,17 +50,14 @@ class CacheController extends AbstractController
     public function get(Request $request): Response
     {
         $key = $request->request->get('key', 'test');
-
-        $value = $this->cache->get($key, function () {
-            return null;
-        });
+        $item = $this->cachePool->getItem($key);
 
         if ($request->getPreferredFormat() === 'json') {
-            return new JsonResponse(['key' => $key, 'value' => $value, 'found' => $value !== null]);
+            return new JsonResponse(['key' => $key, 'value' => $item->isHit() ? $item->get() : null, 'found' => $item->isHit()]);
         }
 
-        if ($value !== null) {
-            $this->addFlash('success', sprintf('"%s" = "%s"', $key, $value));
+        if ($item->isHit()) {
+            $this->addFlash('success', sprintf('"%s" = "%s"', $key, $item->get()));
         } else {
             $this->addFlash('error', sprintf('Key "%s" not found', $key));
         }

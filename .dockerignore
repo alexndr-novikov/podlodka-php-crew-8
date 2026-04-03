@@ -5,6 +5,7 @@
 .env.local
 docker/traefik/certs
 node_modules
+vendor/
 var
 docs
 old

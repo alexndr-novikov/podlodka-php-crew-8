@@ -1,6 +1,6 @@
 services:
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:2025.4.1
     restart: unless-stopped
     command: tunnel --no-autoupdate --url http://app:8080
     networks:
@@ -11,7 +11,7 @@ services:
       - tunnel
 
   ngrok:
-    image: ngrok/ngrok:latest
+    image: ngrok/ngrok:3
     restart: unless-stopped
     command: http app:8080 --log stdout
     environment:

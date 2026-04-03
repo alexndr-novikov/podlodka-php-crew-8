@@ -83,7 +83,6 @@ tunnel-ngrok: ## Start with ngrok tunnel
 reset: ## Full reset: volumes, rebuild, migrate, seed
 	docker compose down -v
 	docker compose up -d --wait --build
-	@sleep 5
 	$(MAKE) migrate
 	$(MAKE) seed
 

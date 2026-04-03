@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Message\HandleWebhookPayload;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,7 +72,7 @@ class WebhookController extends AbstractController
     }
 
     #[Route('/send-test', name: 'webhook_send_test', methods: ['POST'])]
-    public function sendTest(Request $request): Response
+    public function sendTest(Request $request, HttpClientInterface $httpClient): Response
     {
         $tunnelUrl = $request->request->get('tunnel_url', '');
 
@@ -81,29 +82,21 @@ class WebhookController extends AbstractController
         }
 
         try {
-            $ch = curl_init($tunnelUrl . '/webhook/test');
-            curl_setopt_array($ch, [
-                CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => json_encode([
+            $response = $httpClient->request('POST', $tunnelUrl . '/webhook/test', [
+                'json' => [
                     'event' => 'test.webhook',
                     'data' => ['message' => 'Hello from tunnel roundtrip!'],
                     'timestamp' => (new \DateTimeImmutable())->format('c'),
-                ]),
-                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 10,
-                CURLOPT_SSL_VERIFYPEER => false,
+                ],
+                'verify_peer' => false, // Local mkcert certs
+                'timeout' => 10,
             ]);
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $error = curl_error($ch);
-            curl_close($ch);
 
-            if ($error) {
-                $this->addFlash('error', sprintf('Tunnel request failed: %s', $error));
-            } else {
-                $this->addFlash('success', sprintf('Webhook roundtrip OK! Status: %d, Response: %s', $httpCode, $response));
-            }
+            $this->addFlash('success', sprintf(
+                'Webhook roundtrip OK! Status: %d, Response: %s',
+                $response->getStatusCode(),
+                $response->getContent(false),
+            ));
         } catch (\Throwable $e) {
             $this->addFlash('error', sprintf('Error: %s', $e->getMessage()));
         }

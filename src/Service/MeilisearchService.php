@@ -15,9 +15,16 @@ class MeilisearchService
 
     public function getIndex(string $name = 'users'): \Meilisearch\Endpoints\Indexes
     {
-        $this->client->createIndex($name, ['primaryKey' => 'id']);
-
         return $this->client->index($name);
+    }
+
+    public function ensureIndex(string $name = 'users', string $primaryKey = 'id'): void
+    {
+        try {
+            $this->client->createIndex($name, ['primaryKey' => $primaryKey]);
+        } catch (\Meilisearch\Exceptions\ApiException) {
+            // Index already exists
+        }
     }
 
     public function search(string $query, string $index = 'users'): array
