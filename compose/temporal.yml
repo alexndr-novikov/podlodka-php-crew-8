@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-workshop}
       POSTGRES_PWD: ${POSTGRES_PASSWORD:-workshop}
       POSTGRES_SEEDS: postgres
-      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
+      SKIP_SCHEMA_SETUP: false
       DEFAULT_NAMESPACE: default
       DEFAULT_NAMESPACE_RETENTION: 24h
     networks:
@@ -17,7 +17,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "temporal", "operator", "cluster", "health"]
+      test: ["CMD-SHELL", "temporal operator cluster health --address temporal:7233 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10

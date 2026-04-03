@@ -1,10 +1,11 @@
 services:
   localstack:
-    image: localstack/localstack
+    image: localstack/localstack:4
     restart: unless-stopped
     environment:
       SERVICES: s3
       DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      LOCALSTACK_ACKNOWLEDGE_ACCOUNT_REQUIREMENT: 1
     volumes:
       - localstack-data:/var/lib/localstack
       - ../docker/localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh:ro

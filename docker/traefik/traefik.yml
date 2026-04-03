@@ -22,5 +22,7 @@ providers:
     filename: /etc/traefik/dynamic.yml
     watch: true
 
+ping: {}
+
 log:
   level: INFO
