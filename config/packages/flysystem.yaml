@@ -1,7 +1,20 @@
-# Read the documentation at https://github.com/thephpleague/flysystem-bundle/blob/master/docs/1-getting-started.md
 flysystem:
     storages:
         default.storage:
-            adapter: 'local'
+            adapter: 'aws'
             options:
-                directory: '%kernel.project_dir%/var/storage/default'
+                client: 's3_client'
+                bucket: '%env(S3_BUCKET)%'
+
+services:
+    s3_client:
+        class: Aws\S3\S3Client
+        arguments:
+            -
+                version: 'latest'
+                region: '%env(AWS_DEFAULT_REGION)%'
+                endpoint: '%env(AWS_ENDPOINT)%'
+                use_path_style_endpoint: true
+                credentials:
+                    key: '%env(AWS_ACCESS_KEY_ID)%'
+                    secret: '%env(AWS_SECRET_ACCESS_KEY)%'

@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard — Docker Workshop{% endblock %}
+
+{% block body %}
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Docker Workshop</h1>
+        <p class="mt-2 text-gray-600">Демо-приложение: Symfony 7.2 + FrankenPHP + полный стек инфраструктуры</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {% for demo in demos %}
+            <div class="group relative rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md hover:border-indigo-300">
+                <div class="text-4xl mb-4">{{ demo.icon }}</div>
+                <h3 class="text-lg font-semibold text-gray-900">{{ demo.title }}</h3>
+                <p class="mt-2 text-sm text-gray-500">{{ demo.description }}</p>
+                <div class="mt-4 flex items-center justify-between">
+                    <span class="text-sm font-medium text-indigo-600">
+                        Открыть →
+                    </span>
+                    {% if demo.serviceUrl %}
+                        <a href="{{ demo.serviceUrl }}"
+                           target="_blank"
+                           class="text-xs text-gray-400 hover:text-gray-600">
+                            {{ demo.service }} ↗
+                        </a>
+                    {% else %}
+                        <span class="text-xs text-gray-300">{{ demo.service }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
