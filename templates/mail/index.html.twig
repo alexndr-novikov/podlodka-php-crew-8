@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Email — Docker Workshop{% endblock %}
+
+{% block body %}
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Email (Mailpit)</h1>
+        <p class="mt-1 text-gray-500">Отправка email через Symfony Mailer - Mailpit SMTP</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold mb-4">Отправить email</h2>
+            <form method="post" action="{{ path('mail_send') }}" class="space-y-4">
+                <div>
+                    <label for="to" class="block text-sm font-medium text-gray-700">To</label>
+                    <input type="email" name="to" id="to" value="test@example.com"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                </div>
+                <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
+                    <input type="text" name="subject" id="subject" value="Test from Docker Workshop"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                </div>
+                <div>
+                    <label for="body" class="block text-sm font-medium text-gray-700">Body</label>
+                    <textarea name="body" id="body" rows="3"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">Hello from Symfony + Mailpit!</textarea>
+                </div>
+                <button type="submit"
+                        class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                    Отправить
+                </button>
+            </form>
+        </div>
+
+        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold mb-4">Сервис</h2>
+            <dl class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <dt class="text-gray-500">SMTP</dt>
+                    <dd class="text-gray-900">mailpit:1025</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-gray-500">Symfony DSN</dt>
+                    <dd class="text-gray-900 font-mono text-xs">smtp://mailpit:1025</dd>
+                </div>
+            </dl>
+            <a href="https://mailpit.workshop.localhost:8443" target="_blank"
+               class="mt-4 inline-block text-sm text-indigo-600 hover:text-indigo-500">
+                Открыть Mailpit UI
+            </a>
+        </div>
+    </div>
+{% endblock %}

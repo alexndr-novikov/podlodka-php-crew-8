@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Search — Docker Workshop{% endblock %}
+
+{% block body %}
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Search (Meilisearch)</h1>
+        <p class="mt-1 text-gray-500">Полнотекстовый поиск с typo-tolerance</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div class="space-y-6">
+            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-semibold mb-4">Поиск</h2>
+                <form method="get" action="{{ path('search_index') }}">
+                    <div class="flex gap-2">
+                        <input type="text" name="q" value="{{ query }}" placeholder="Введите запрос..."
+                               class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                        <button type="submit"
+                                class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                            Найти
+                        </button>
+                    </div>
+                </form>
+
+                {% if results.hits is defined and results.hits is not empty %}
+                    <ul class="mt-4 space-y-2">
+                        {% for hit in results.hits %}
+                            <li class="rounded-md bg-gray-50 p-3 text-sm">
+                                <span class="font-medium">{{ hit.name ?? hit.id }}</span>
+                                {% if hit.email is defined %}
+                                    <span class="text-gray-400 ml-2">{{ hit.email }}</span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <p class="mt-2 text-xs text-gray-400">{{ results.estimatedTotalHits ?? 0 }} results in {{ results.processingTimeMs ?? 0 }}ms</p>
+                {% elseif query %}
+                    <p class="mt-4 text-sm text-gray-400">Ничего не найдено</p>
+                {% endif %}
+            </div>
+
+            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-semibold mb-4">Добавить документ</h2>
+                <form method="post" action="{{ path('search_add') }}" class="space-y-3">
+                    <input type="text" name="name" placeholder="Имя" required
+                           class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                    <input type="email" name="email" placeholder="Email" required
+                           class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                    <button type="submit"
+                            class="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">
+                        Добавить
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm h-fit">
+            <h2 class="text-lg font-semibold mb-4">Сервис</h2>
+            <dl class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <dt class="text-gray-500">URL</dt>
+                    <dd class="text-gray-900 font-mono text-xs">meilisearch:7700</dd>
+                </div>
+            </dl>
+            <a href="https://search.workshop.localhost:8443" target="_blank"
+               class="mt-4 inline-block text-sm text-indigo-600 hover:text-indigo-500">
+                Открыть Meilisearch
+            </a>
+        </div>
+    </div>
+{% endblock %}
