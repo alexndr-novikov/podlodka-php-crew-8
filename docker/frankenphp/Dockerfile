@@ -1,4 +1,4 @@
-#syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1
 
 # --- Base ---
 FROM dunglas/frankenphp:1-php8.4-bookworm AS base
@@ -9,7 +9,7 @@ WORKDIR /app
 
 VOLUME /app/var/
 
-# System deps + PHP extensions
+# System deps
 # hadolint ignore=DL3008
 RUN <<-EOF
     apt-get update
@@ -17,24 +17,32 @@ RUN <<-EOF
         file \
         git \
         unzip
-    install-php-extensions \
-        @composer \
-        apcu \
-        amqp \
-        bcmath \
-        gd \
-        grpc \
-        imagick \
-        intl \
-        opcache \
-        opentelemetry \
-        pdo_pgsql \
-        protobuf \
-        redis \
-        sockets \
-        zip
     rm -rf /var/lib/apt/lists/*
 EOF
+
+# PHP extensions — core
+RUN install-php-extensions \
+    @composer \
+    apcu \
+    bcmath \
+    gd \
+    intl \
+    opcache \
+    pdo_pgsql \
+    redis \
+    sockets \
+    zip
+
+# PHP extensions — additional (heavier builds)
+RUN install-php-extensions \
+    amqp \
+    imagick
+
+# PHP extensions — observability (uncomment when needed, grpc takes ~10min to compile)
+# RUN install-php-extensions \
+#     grpc \
+#     protobuf \
+#     opentelemetry
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
