@@ -8,3 +8,19 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+# Docker
+docker/traefik/certs/*.pem
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (Tailwind)
+/node_modules/
