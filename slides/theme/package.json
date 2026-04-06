@@ -1,0 +1,17 @@
+{
+  "name": "@podlodka/slidev-theme",
+  "engines": {
+    "slidev": ">=0.48.0"
+  },
+  "slidev": {
+    "colorSchema": "light",
+    "defaults": {
+      "fonts": {
+        "sans": "Lexend",
+        "mono": "JetBrains Mono",
+        "local": "Unbounded, Lexend, JetBrains Mono",
+        "provider": "google"
+      }
+    }
+  }
+}

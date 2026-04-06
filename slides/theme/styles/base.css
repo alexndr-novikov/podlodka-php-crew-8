@@ -1,0 +1,17 @@
+:root {
+  --purple: #6f02cd;
+  --purple-deep: #4a0187;
+  --purple-dark: #1a0033;
+  --purple-light: #f3e8ff;
+  --purple-glow: rgba(111, 2, 205, 0.15);
+  --teal: #00d4aa;
+  --teal-light: #e0fff7;
+  --bg-primary: #ffffff;
+  --bg-secondary: #faf7ff;
+  --bg-dark: #110022;
+  --bg-code: #1e1136;
+  --text-primary: #1a0033;
+  --text-secondary: #5c4a73;
+  --text-on-dark: #f0e6ff;
+  --text-muted: #9882b0;
+}
