@@ -8,6 +8,9 @@ fonts:
   mono: JetBrains Mono
   local: Unbounded, Lexend, JetBrains Mono
   provider: google
+drawings:
+  persist: false
+transition: slide-left
 ---
 
 # Docker для PHP‑разработчика в 2026
@@ -17,3 +20,78 @@ fonts:
 <div class="abs-bl m-6 text-sm opacity-50">
 Podlodka PHP Crew 8
 </div>
+
+---
+
+# Что нас ждёт
+
+<div class="two-col-custom">
+<div>
+
+- Эволюция Docker Compose
+- Современный Dockerfile для PHP
+- PHP-рантаймы: FrankenPHP, RoadRunner
+- Контейнеры для инфраструктуры
+- Разработка и отладка
+- Фоновые задачи
+
+</div>
+<div>
+
+- Observability Stack
+- CI/CD и тестирование
+- Docker Desktop и альтернативы
+- Референсные реализации
+- Best Practices 2026
+- Live coding воркшоп
+
+</div>
+</div>
+
+---
+src: ./01-evolution.md
+---
+
+---
+src: ./02-dockerfile.md
+---
+
+---
+src: ./03-runtimes.md
+---
+
+---
+src: ./04-infrastructure.md
+---
+
+---
+src: ./05-development.md
+---
+
+---
+src: ./06-background.md
+---
+
+---
+src: ./07-observability.md
+---
+
+---
+src: ./08-cicd.md
+---
+
+---
+src: ./09-desktop.md
+---
+
+---
+src: ./10-references.md
+---
+
+---
+src: ./11-bestpractices.md
+---
+
+---
+src: ./12-workshop.md
+---
