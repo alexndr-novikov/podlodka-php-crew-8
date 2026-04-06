@@ -6,7 +6,6 @@ fonts:
   sans: Lexend
   serif: Lexend
   mono: JetBrains Mono
-  local: Unbounded, Lexend, JetBrains Mono
   provider: google
 drawings:
   persist: false

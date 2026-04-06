@@ -19,7 +19,7 @@
 }
 
 .two-col-cards-layout :deep(h1) {
-  font-family: 'Unbounded', cursive;
+  font-family: 'Unbounded', sans-serif;
   color: var(--purple);
   font-weight: 700;
   margin-bottom: 1.5rem;

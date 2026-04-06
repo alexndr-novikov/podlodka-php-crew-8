@@ -42,7 +42,7 @@ defineProps({
 }
 
 .compare-card h3 {
-  font-family: 'Unbounded', cursive;
+  font-family: 'Unbounded', sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--purple, #6f02cd);

@@ -9,7 +9,6 @@
       "fonts": {
         "sans": "Lexend",
         "mono": "JetBrains Mono",
-        "local": "Unbounded, Lexend, JetBrains Mono",
         "provider": "google"
       }
     }

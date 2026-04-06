@@ -10,7 +10,7 @@
 
 <style scoped>
 .section-layout {
-  background: var(--purple);
+  background: var(--purple, #6f02cd);
   color: white;
   display: flex;
   flex-direction: column;
@@ -33,7 +33,7 @@
 }
 
 .section-number {
-  font-family: 'Unbounded', cursive;
+  font-family: 'Unbounded', sans-serif;
   font-size: 8rem;
   font-weight: 900;
   opacity: 0.2;
@@ -45,7 +45,7 @@
 }
 
 .content :deep(h1) {
-  font-family: 'Unbounded', cursive;
+  font-family: 'Unbounded', sans-serif;
   font-size: 2.5rem;
   font-weight: 700;
   color: white;

@@ -24,7 +24,7 @@
 
 .content :deep(h1),
 .content :deep(h2) {
-  font-family: 'Unbounded', cursive;
+  font-family: 'Unbounded', sans-serif;
   color: var(--teal, #00d4aa);
   font-weight: 700;
   margin-bottom: 1.5rem;

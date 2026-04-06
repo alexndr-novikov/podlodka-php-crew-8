@@ -31,7 +31,7 @@
 .content { z-index: 1; }
 
 .content :deep(h1) {
-  font-family: 'Unbounded', cursive;
+  font-family: 'Unbounded', sans-serif;
   font-size: 4rem;
   font-weight: 800;
   color: var(--text-on-dark);
