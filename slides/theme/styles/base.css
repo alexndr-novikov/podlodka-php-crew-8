@@ -27,17 +27,25 @@
   font-family: 'Unbounded', cursive;
 }
 
+.slidev-layout h1 {
+  font-size: 2.8rem;
+}
+
 .slidev-layout h2 {
+  font-size: 2.2rem;
   color: var(--purple);
   font-weight: 700;
 }
 
 .slidev-layout h3 {
+  font-size: 1.5rem;
   color: var(--purple-deep);
   font-weight: 600;
 }
 
-.slidev-layout ul li {
+.slidev-layout ul li,
+.slidev-layout p {
+  font-size: 1.25rem;
   color: var(--text-secondary);
   line-height: 1.5;
 }

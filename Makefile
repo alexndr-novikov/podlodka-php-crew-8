@@ -1,6 +1,7 @@
 .PHONY: help setup up down restart logs shell watch build \
         composer console migrate seed test \
-        debug tunnel tunnel-ngrok reset lint
+        debug tunnel tunnel-ngrok reset lint \
+        slides slides-build slides-export
 
 .DEFAULT_GOAL := help
 
@@ -89,3 +90,14 @@ reset: ## Full reset: volumes, rebuild, migrate, seed
 lint: ## Run linters (PHPStan + CS Fixer)
 	docker compose exec app vendor/bin/phpstan analyse
 	docker compose exec app vendor/bin/php-cs-fixer fix --dry-run --diff
+
+# --- Slides ---
+
+slides: ## Start Slidev dev server with HMR
+	cd slides && npx slidev --port 3030 --open
+
+slides-build: ## Build slides as static SPA
+	cd slides && npx slidev build
+
+slides-export: ## Export slides to PDF
+	cd slides && npx slidev export
