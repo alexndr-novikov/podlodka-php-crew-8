@@ -7,30 +7,18 @@ sectionNumber: '01'
 
 ---
 
-<div class="text-center mt-8">
-  <div class="inline-block opacity-20 line-through" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--text-muted);">docker-compose.yml</div>
-</div>
-
-<div class="text-center mt-4">
-  <div class="inline-block" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--purple);">compose.yml</div>
-</div>
-
-<div class="text-center mt-8 text-xl" style="color: var(--text-secondary);">
-  Новое каноничное имя файла. docker-compose.yml всё ещё работает, но deprecated.
+<div class="flex flex-col items-center">
+  <div class="opacity-20 line-through" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--text-muted);">docker-compose.yml</div>
+  <div class="mt-4" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--purple);">compose.yml</div>
+  <div class="mt-8 text-xl" style="color: var(--text-secondary);">Новое каноничное имя файла. docker-compose.yml всё ещё работает, но deprecated.</div>
 </div>
 
 ---
 
-<div class="text-center mt-8">
-  <div class="inline-block opacity-20 line-through" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--text-muted);">docker-compose up</div>
-</div>
-
-<div class="text-center mt-4">
-  <div class="inline-block" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--purple);">docker compose up</div>
-</div>
-
-<div class="text-center mt-8 text-xl" style="color: var(--text-secondary);">
-  V1 (Python) → V2 (Go). Отдельный бинарник → плагин Docker CLI. 2024: V1 окончательно удалён.
+<div class="flex flex-col items-center">
+  <div class="opacity-20 line-through" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--text-muted);">docker-compose up</div>
+  <div class="mt-4" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--purple);">docker compose up</div>
+  <div class="mt-8 text-xl" style="color: var(--text-secondary);">V1 (Python) → V2 (Go). Отдельный бинарник → плагин Docker CLI. 2024: V1 окончательно удалён.</div>
 </div>
 
 ---
