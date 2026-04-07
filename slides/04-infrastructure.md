@@ -88,6 +88,18 @@ class: bg-purple-50/30
 Только S3 → MinIO. Нужны SQS/SNS/Lambda → LocalStack.
 
 ---
+
+# ⚠️ LocalStack: конец эпохи
+
+<div class="accent-line"></div>
+
+- **Февраль 2025** — LocalStack объявил о закрытии Community Edition
+- Проект переходит на полностью коммерческую модель
+- AWS запустил официальный форк — **Floci** (`github.com/hectorvent/floci`)
+- Floci поддерживается AWS, совместим с LocalStack API
+- **Вывод:** для новых проектов — MinIO (S3) или Floci (полный AWS)
+
+---
 layout: compare
 ---
 
