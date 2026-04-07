@@ -21,6 +21,10 @@
 .slidev-layout {
   font-family: 'Lexend', sans-serif;
   color: var(--text-primary);
+  padding: 3rem 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .slidev-layout h1,
