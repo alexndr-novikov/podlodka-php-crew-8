@@ -53,7 +53,19 @@
 .slidev-layout p {
   font-size: 1.25rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.8;
+}
+
+.slidev-layout ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.slidev-layout h1 + *,
+.slidev-layout h2 + *,
+.slidev-layout .accent-line + * {
+  margin-top: 0.75rem;
 }
 
 .slidev-layout code {
