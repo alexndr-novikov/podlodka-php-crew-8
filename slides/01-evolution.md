@@ -7,6 +7,22 @@ sectionNumber: '01'
 
 ---
 
+# ~~docker-compose.yml~~ → compose.yml
+
+<div class="text-center mt-12">
+  <div class="inline-block text-6xl font-bold opacity-20 line-through" style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">docker-compose up</div>
+</div>
+
+<div class="text-center mt-4">
+  <div class="inline-block text-6xl font-bold" style="font-family: 'JetBrains Mono', monospace; color: var(--purple);">docker compose up</div>
+</div>
+
+<div class="text-center mt-8 text-xl" style="color: var(--text-secondary);">
+  V1 (Python) → V2 (Go) · Отдельный бинарник → плагин Docker CLI · 2024: V1 окончательно удалён
+</div>
+
+---
+
 # Формат и CLI
 
 <div class="accent-line"></div>
