@@ -102,7 +102,6 @@ slides-build: ## Build slides as static SPA
 slides-export: ## Export slides to PDF
 	cd slides && npx slidev export
 
-slides-share: ## Share slides via Cloudflare Tunnel (public URL)
-	@echo "$(GREEN)Starting Slidev + Cloudflare Tunnel...$(RESET)"
-	@echo "$(BLUE)Slides will be available at the tunnel URL below$(RESET)"
-	@cd slides && npx slidev --port 3030 &>/dev/null & sleep 5 && cloudflared tunnel --url http://localhost:3030
+slides-share: slides-build ## Share slides via Cloudflare Tunnel (public URL)
+	@echo "$(GREEN)Serving built slides + Cloudflare Tunnel...$(RESET)"
+	@npx --yes serve slides/dist -l 3031 &>/dev/null & sleep 2 && cloudflared tunnel --url http://localhost:3031
