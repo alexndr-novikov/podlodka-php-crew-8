@@ -27,6 +27,19 @@ services:
 ```
 
 ---
+
+# `docker debug` — отладка любого контейнера
+
+<div class="accent-line"></div>
+
+- Присоединяет debug-shell к **любому** запущенному контейнеру
+- Работает даже с **distroless / минимальными** образами (без sh/bash)
+- Инжектит утилиты (vim, curl, htop, strace) на лету, не меняя образ
+- `docker debug <container>` — и ты внутри с полным набором инструментов
+
+Идеально для production-like контейнеров на базе `php:8.4-cli` без лишних пакетов
+
+---
 layout: compare
 ---
 

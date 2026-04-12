@@ -32,6 +32,18 @@ sectionNumber: '08'
 </div>
 
 ---
+
+# Testcontainers для PHP
+
+<div class="accent-line"></div>
+
+- Интеграционные тесты с **реальными контейнерами** прямо из PHPUnit
+- `testcontainers-php` — поднимает PostgreSQL, Redis, Meilisearch на лету
+- Каждый тест получает чистый контейнер — нет shared state
+- Замена моков: тестируем с настоящей БД, а не с фейковой
+- Тренд 2025–2026: Testcontainers стал стандартом для integration tests
+
+---
 layout: compare
 alt: true
 ---

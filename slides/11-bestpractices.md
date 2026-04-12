@@ -7,6 +7,18 @@ sectionNumber: '11'
 
 ---
 
+# `docker init` — быстрый старт
+
+<div class="accent-line"></div>
+
+- Интерактивный генератор: **Dockerfile + compose.yml + .dockerignore**
+- Поддерживает PHP (и Go, Python, Node, Rust, Java, .NET)
+- `docker init` в папке проекта → отвечаешь на вопросы → готовый стартовый набор
+- Идеально для onboarding новых разработчиков в проект
+- Генерирует production-ready конфигурацию с multi-stage builds
+
+---
+
 # Архитектура и конфигурация
 
 <div class="accent-line"></div>
