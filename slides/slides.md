@@ -16,7 +16,7 @@ transition: slide-left
 
 Локальное окружение, актуальные практики, современные контейнеры
 
-<div class="abs-bl m-6 text-sm opacity-50">
+<div class="abs-bl m-6 text-sm" style="color: var(--text-muted); left: 4rem;">
 Александр Новиков · Podlodka PHP Crew 8
 </div>
 
