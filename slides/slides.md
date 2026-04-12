@@ -17,7 +17,7 @@ transition: slide-left
 Локальное окружение, актуальные практики, современные контейнеры
 
 <div class="abs-bl m-6 text-sm opacity-50">
-Podlodka PHP Crew 8
+Александр Новиков · Podlodka PHP Crew 8
 </div>
 
 ---
