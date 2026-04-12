@@ -6,7 +6,7 @@ defineProps({
 
 <template>
   <div class="page-number" :class="{ 'page-number--light': light }">
-    {{ $slidev.nav.currentSlideNo }} / {{ $slidev.nav.total }}
+    {{ $slidev.nav.currentSlideNo }}
   </div>
 </template>
 
