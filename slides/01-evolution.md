@@ -18,7 +18,7 @@ sectionNumber: '01'
 <div class="flex flex-col items-center">
   <div class="opacity-20 line-through" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--text-muted);">docker-compose up</div>
   <div class="mt-4" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--purple);">docker compose up</div>
-  <div class="mt-8 text-xl" style="color: var(--text-secondary);">V1 (Python) → V2 (Go). Отдельный бинарник → плагин Docker CLI. 2024: V1 окончательно удалён.</div>
+  <div class="mt-8 text-xl text-center" style="color: var(--text-secondary);">V1 (Python) → V2 (Go). Отдельный бинарник → плагин Docker CLI. 2024: V1 окончательно удалён.</div>
 </div>
 
 ---
