@@ -1,7 +1,12 @@
+<script setup>
+import PageNumber from '../components/PageNumber.vue'
+</script>
+
 <template>
   <div class="slidev-layout two-col-cards-layout" :class="{ alt: $attrs.alt }">
     <div class="accent-line"></div>
     <slot />
+    <PageNumber />
   </div>
 </template>
 

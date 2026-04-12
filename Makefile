@@ -1,7 +1,7 @@
 .PHONY: help setup up down restart logs shell watch build \
         composer console migrate seed test \
         debug tunnel tunnel-ngrok reset lint \
-        slides slides-build slides-export
+        slides slides-build slides-export slides-share
 
 .DEFAULT_GOAL := help
 
@@ -101,3 +101,10 @@ slides-build: ## Build slides as static SPA
 
 slides-export: ## Export slides to PDF
 	cd slides && npx slidev export
+
+slides-share: ## Share slides via Cloudflare Tunnel (public URL). попробуй сделать  make slides-share - у меня выбило ошибку
+	@echo "$(GREEN)Starting Slidev + Cloudflare Tunnel...$(RESET)"
+	@echo "$(BLUE)Slides will be available at the tunnel URL below$(RESET)"
+	cd slides && npx slidev --port 3030 &
+	@sleep 5
+	cloudflared tunnel --url http://localhost:3030

@@ -1,9 +1,14 @@
+<script setup>
+import PageNumber from '../components/PageNumber.vue'
+</script>
+
 <template>
   <div class="slidev-layout code-layout">
     <div class="pattern-overlay"></div>
     <div class="content">
       <slot />
     </div>
+    <PageNumber :light="true" />
   </div>
 </template>
 
