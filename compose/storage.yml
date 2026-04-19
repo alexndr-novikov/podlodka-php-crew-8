@@ -17,6 +17,29 @@ services:
       timeout: 5s
       retries: 5
 
+  s3manager:
+    image: cloudlena/s3manager:latest
+    restart: unless-stopped
+    environment:
+      ENDPOINT: localstack:4566
+      ACCESS_KEY_ID: workshop
+      SECRET_ACCESS_KEY: workshop
+      REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      USE_SSL: "false"
+      SKIP_SSL_VERIFICATION: "true"
+      FORCE_PATH_STYLE: "true"
+    depends_on:
+      localstack:
+        condition: service_healthy
+    networks:
+      - workshop
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.s3manager.rule=Host(`s3.workshop.localhost`)"
+      - "traefik.http.routers.s3manager.entrypoints=websecure"
+      - "traefik.http.routers.s3manager.tls=true"
+      - "traefik.http.services.s3manager.loadbalancer.server.port=8080"
+
 volumes:
   localstack-data:
 

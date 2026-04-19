@@ -61,6 +61,7 @@ services:
         - action: rebuild
           path: ../composer.lock
 
+  # rewrite to extend
   worker-messenger:
     build:
       context: ..

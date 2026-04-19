@@ -26,7 +26,7 @@ class DashboardController extends AbstractController
                 'route' => 'storage_index',
                 'icon' => "\u{1F4E6}",
                 'service' => 'LocalStack',
-                'serviceUrl' => null,
+                'serviceUrl' => 'https://s3.workshop.localhost:8443',
             ],
             [
                 'title' => 'Поиск',
