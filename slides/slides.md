@@ -10,26 +10,24 @@ fonts:
 drawings:
   persist: false
 transition: slide-left
+highlighter: shiki
+layout: cover
+class: p-0
 ---
 
-# Docker для PHP‑разработчика в 2026
-
-Локальное окружение, актуальные практики, современные контейнеры
-
-<div class="abs-bl m-6 text-sm" style="color: var(--text-muted); left: 4rem;">
-Александр Новиков · Podlodka PHP Crew 8
-</div>
+<img src="/PHP8_Novikov.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
 
 ---
 
-# «Зачем доклад, если есть ChatGPT?»
+# «Зачем доклад, если есть LLM?»
 
 <div class="accent-line"></div>
 
-- LLM **не сгенерировал треть тем** из этого доклада — даже при прямом запросе
-- Каждая итерация пересборки Docker с AI-агентом **ещё дольше**: агент думает, читает логи, пробует варианты
+- LLM **не сгенерировал половину тем** из этого доклада
+- Docker build + agent think = **долго х 2**
 - Лучше **сразу знать что хочешь** и скормить в контекст, чем итерировать вслепую
 - Системное знание Docker экономит время **особенно** при работе с AI
+- Знать самому всегда приятнее :)
 
 ---
 
@@ -53,7 +51,7 @@ transition: slide-left
 - Docker Desktop и альтернативы
 - Референсные реализации
 - Best Practices 2026
-- Live coding воркшоп
+- Демонстрация проекта с реализацией советов
 
 </div>
 </div>

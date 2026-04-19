@@ -48,7 +48,7 @@ class: bg-purple-50/30
 - `include` — подключение внешних compose-файлов
 - `configs` и `secrets` на уровне top-level (без Swarm)
 - `profiles` для группировки сервисов (dev, test, debug)
-- `depends_on` с `condition: service_healthy`
+- `depends_on` с `condition: service_healthy` (и не только)
 - `name:` — имя проекта прямо в файле (вместо имени директории)
 - Удаление `version:` — поле больше не нужно
 
@@ -137,16 +137,15 @@ services:
 
 <div class="accent-line"></div>
 
-<div style="font-size: 1.1rem;">
+<div style="font-size: 0.85rem;">
 
-| Приоритет | Источник |
-|:---------:|----------|
-| 1 (высший) | `docker compose run --env` |
-| 2 | `environment:` в compose.yml |
-| 3 | `env_file:` в compose.yml |
-| 4 | `ENV` в Dockerfile |
-| 5 | Host OS переменные окружения |
-| 6 (низший) | `.env` файл |
+|  #  |  `compose run --env`  |  `environment:`  |  `env_file:`  |  Image `ENV` |  Host OS  |  `.env`  |  Result  |
+|:--:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|  1 |  -  |  -  |  -  |  -  |  1.4  |  1.3  |  -  |
+|  2 |  -  |  -  |  1.6  |  1.5  |  1.4  |  -  |  **1.6**  |
+|  3 |  -  |  1.7  |  -  |  1.5  |  1.4  |  -  |  **1.7**  |
+|  4 |  -  |  -  |  -  |  1.5  |  1.4  |  1.3  |  **1.5**  |
+|  5 |  1.8  |  -  |  -  |  1.5  |  1.4  |  1.3  |  **1.8**  |
 
 </div>
 

@@ -26,9 +26,10 @@ class: bg-purple-50/30
 <div class="accent-line"></div>
 
 - **dunglas/symfony-docker** — официальный стек на FrankenPHP
-- **Symfony CLI** — встроенный локальный сервер
-- **Symfony Messenger** — очереди через RabbitMQ/Redis/Doctrine
-- **Symfony Runtime** — интеграция с FrankenPHP/RoadRunner
+- **API Platform** — расширенный Docker-стек на базе symfony-docker
+- **Docker-паттерны из dunglas/symfony-docker** — multi-stage, Composer, Caddy + auto-HTTPS
+- **Symfony Docker docs** — официальная документация по деплою с Docker
+- **Symfony Flex** — Docker-рецепты генерируются при установке пакетов
 
 ---
 

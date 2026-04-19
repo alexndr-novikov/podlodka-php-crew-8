@@ -37,6 +37,8 @@ services:
               capabilities: [gpu]
 ```
 
+`deploy:` — синтаксис из Swarm, но GPU-резервация работает и в обычном `docker compose up`
+
 AI/ML рядом с PHP: локальный inference, генерация embeddings, OCR с GPU-ускорением
 
 ---

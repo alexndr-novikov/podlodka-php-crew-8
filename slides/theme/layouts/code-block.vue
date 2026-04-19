@@ -35,17 +35,57 @@ import PageNumber from '../components/PageNumber.vue'
   margin-bottom: 1.5rem;
 }
 
-.content :deep(code) {
+.content :deep(:not(pre) > code) {
   background: rgba(255,255,255,0.1);
   color: var(--teal, #00d4aa);
 }
 
-.content :deep(.shiki),
-.content :deep(pre) {
-  background: rgba(0,0,0,0.3) !important;
+.content :deep(pre code) {
+  background: transparent !important;
+}
+
+.content :deep(.slidev-code-wrapper) {
+  background: #0d0b1a !important;
   border-radius: 0.75rem;
   padding: 1.5rem;
-  border-left: 3px solid var(--purple, #6f02cd);
+  border-left: 3px solid var(--teal, #00d4aa);
+}
+
+.content :deep(pre),
+.content :deep(.slidev-code) {
+  background: transparent !important;
+  border: none !important;
+  padding: 0;
+}
+
+.content :deep(.shiki),
+.content :deep(.shiki code),
+.content :deep(.shiki span) {
+  font-family: Consolas, 'JetBrains Mono', monospace !important;
+  font-size: 0.95rem !important;
+}
+
+.content :deep(.shiki) {
+  background: transparent !important;
+}
+
+.content :deep(.shiki .line),
+.content :deep(.shiki .line span) {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.content :deep(.shiki span) {
+  color: #f0eff4 !important;
+}
+
+.content :deep(.shiki .line > span:first-child) {
+  color: #7dd3fc !important;
+}
+
+.content :deep(.shiki .line span[style*="666666"]),
+.content :deep(.shiki .line span[style*="758575"]) {
+  color: #94a3b8 !important;
 }
 
 .pattern-overlay {
