@@ -33,24 +33,6 @@ class: bg-purple-50/30
 - Spiral Framework, Laravel Octane, Symfony
 
 ---
-
-# Сравнение подходов
-
-<div class="accent-line"></div>
-
-<table class="slide-table">
-  <thead>
-    <tr><th>Стек</th><th>Плюсы</th><th>Минусы</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><strong>Nginx + PHP-FPM</strong></td><td>Проверенный, привычный</td><td>Два процесса, конфигурация</td></tr>
-    <tr><td><strong>FrankenPHP</strong></td><td>Всё в одном, HTTPS, HTTP/3</td><td>Молодой проект</td></tr>
-    <tr><td><strong>RoadRunner</strong></td><td>gRPC, WS, очереди из коробки</td><td>Утечки памяти при ошибках</td></tr>
-    <tr><td><strong>Swoole/OpenSwoole</strong></td><td>Async PHP, высокая пропускная способность</td><td>Несовместимость с частью библиотек</td></tr>
-  </tbody>
-</table>
-
----
 layout: default
 class: bg-purple-50/30
 ---

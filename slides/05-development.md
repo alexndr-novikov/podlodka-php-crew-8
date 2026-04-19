@@ -40,18 +40,6 @@ services:
 Идеально для production-like контейнеров на базе `php:8.4-cli` без лишних пакетов
 
 ---
-layout: compare
----
-
-# Профилирование и мониторинг
-
-<div class="comparison-grid">
-  <CompareCard title="Excimer" description="Low-overhead profiling. Используется Wikipedia" />
-  <CompareCard title="SPX" description="Простой профилировщик с веб-UI" />
-  <CompareCard title="Buggregator" description="All-in-one: Xdebug, VarDumper, Ray, SMTP, Sentry, Profiler" />
-</div>
-
----
 layout: default
 class: bg-purple-50/30
 ---

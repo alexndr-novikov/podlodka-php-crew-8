@@ -71,13 +71,3 @@ class: bg-purple-50/30
 - Для разработки: <span class="tag tag-teal">xdebug</span> <span class="tag tag-teal">pcov</span> <span class="tag tag-teal">excimer</span>
 - Разделение dev/prod через multi-stage targets
 
----
-
-# Безопасность
-
-<div class="accent-line"></div>
-
-- Запуск от не-root пользователя — `USER www-data`
-- Синхронизация UID/GID через build args
-- Минимизация attack surface: удаление dev-пакетов в production
-- Multi-stage: `--target dev` / `--target prod` / `--target test`

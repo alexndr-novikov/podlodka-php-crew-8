@@ -3,33 +3,17 @@ layout: section
 sectionNumber: '08'
 ---
 
-# CI/CD и тестирование
+# Тестирование
 
 ---
 
-# Генерация PDF и браузерное тестирование
+# Браузерное тестирование
 
 <div class="accent-line"></div>
-
-<div class="two-col-custom">
-<div>
-
-### PDF
-
-- **Gotenberg 8** — Chromium + LibreOffice, REST API
-- Замена wkhtmltopdf (deprecated)
-
-</div>
-<div>
-
-### Браузерные тесты
 
 - **Selenium** — standalone-chrome
 - **Playwright** — mcr.microsoft.com
 - **Browserless** — headless Chrome API
-
-</div>
-</div>
 
 ---
 

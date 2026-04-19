@@ -46,7 +46,6 @@ class: p-0
 </div>
 <div>
 
-- Observability Stack
 - CI/CD и тестирование
 - Docker Desktop и альтернативы
 - Референсные реализации
@@ -78,10 +77,6 @@ src: ./05-development.md
 
 ---
 src: ./06-background.md
----
-
----
-src: ./07-observability.md
 ---
 
 ---

@@ -28,10 +28,10 @@ alt: true
 # Кэш: Redis и альтернативы
 
 <div class="comparison-grid">
-  <CompareCard title="Redis 7" :items="['redis-stack для RedisInsight', 'Классика, проверенный']" />
-  <CompareCard title="Valkey 8" :items="['Fork Redis (open-source)', 'Drop-in замена']" />
-  <CompareCard title="DragonflyDB" :items="['Высокопроизводительная', 'Redis-совместимая']" />
-  <CompareCard title="KeyDB" :items="['Многопоточный', 'Redis-совместимый']" />
+  <CompareCard title="Redis 7" :items="['Однопоточный, SSPL-лицензия', 'redis-stack = UI + модули', 'Классика, но уже не open-source']" />
+  <CompareCard title="Valkey 8" :items="['Fork Redis, BSD-лицензия', 'Multi-threaded I/O', 'Drop-in замена, меняешь image']" />
+  <CompareCard title="DragonflyDB" :items="['Многопоточный (shared-nothing)', 'До 25x throughput vs Redis', 'BSL-лицензия, больше памяти']" />
+  <CompareCard title="KeyDB" :items="['Fork Redis + threading', 'Master-master из коробки', 'Развитие замедлилось']" />
 </div>
 
 ---
@@ -54,10 +54,10 @@ alt: true
 # Поиск
 
 <div class="comparison-grid">
-  <CompareCard title="Meilisearch v1" description="Рекомендация Laravel Scout. Простой, быстрый" />
-  <CompareCard title="Typesense 27" description="Альтернатива. Typo-tolerance из коробки" />
-  <CompareCard title="Elasticsearch 8" description="Для сложных случаев. Full-text + аналитика" />
-  <CompareCard title="Manticore" description="Лёгкая альтернатива. Бывший Sphinx" />
+  <CompareCard title="Meilisearch v1" description="⭐ 57k — Рекомендация Laravel Scout. Простой, быстрый" />
+  <CompareCard title="Typesense 27" description="⭐ 26k — Альтернатива. Typo-tolerance из коробки" />
+  <CompareCard title="Elasticsearch 8" description="⭐ 77k — Для сложных случаев. Full-text + аналитика" />
+  <CompareCard title="Manticore" description="⭐ 12k — Лёгкая альтернатива. Бывший Sphinx" />
 </div>
 
 ---
@@ -93,7 +93,7 @@ class: bg-purple-50/30
 
 <div class="accent-line"></div>
 
-- **Февраль 2025** — LocalStack объявил о закрытии Community Edition
+- **Декабрь 2025** — LocalStack объявил о закрытии Community Edition (март 2026 — CE архивирован)
 - Проект переходит на полностью коммерческую модель
 - AWS запустил официальный форк — **Floci** (`github.com/hectorvent/floci`)
 - Floci поддерживается AWS, совместим с LocalStack API
@@ -112,3 +112,15 @@ layout: compare
 </div>
 
 Локальные домены: `*.localhost`, `*.test` + `mkcert` для HTTPS
+
+---
+layout: compare
+---
+
+# Генерация PDF
+
+<div class="comparison-grid">
+  <CompareCard title="Gotenberg 8" :items="['Chromium + LibreOffice в контейнере', 'REST API — HTML/URL/Office → PDF', 'Замена wkhtmltopdf (deprecated)']" />
+  <CompareCard title="Headless Chrome" :items="['browserless/chrome или Playwright', 'Точная вёрстка — рендерит как браузер', 'Тяжёлый образ (~1 GB)']" />
+  <CompareCard title="WeasyPrint" :items="['Python, CSS Paged Media', 'Лёгкий (~100 MB)', 'Ограниченная поддержка JS']" />
+</div>
