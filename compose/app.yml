@@ -57,35 +57,19 @@ services:
         - action: rebuild
           path: ../composer.lock
 
-  # rewrite to extend
   worker-messenger:
-    build:
-      context: ..
-      dockerfile: docker/frankenphp/Dockerfile
-      target: dev
+    extends:
+      service: app
     restart: unless-stopped
     command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600", "-vv"]
-    environment:
-      APP_ENV: ${APP_ENV:-dev}
-      DATABASE_URL: "postgresql://${POSTGRES_USER:-workshop}:${POSTGRES_PASSWORD:-workshop}@postgres:5432/${POSTGRES_DB:-workshop}?serverVersion=${POSTGRES_VERSION:-17}&charset=utf8"
-      MESSENGER_TRANSPORT_DSN: "redis://valkey:6379/messages"
-      VALKEY_URL: ${VALKEY_URL:-redis://valkey:6379}
-      MAILER_DSN: ${MAILER_DSN:-smtp://mailpit:1025}
-      AWS_ENDPOINT: ${AWS_ENDPOINT:-http://localstack:4566}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-workshop}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-workshop}
-      S3_BUCKET: ${S3_BUCKET:-workshop-uploads}
-      MEILI_URL: ${MEILI_URL:-http://meilisearch:7700}
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-workshop-meili-key}
-    volumes:
-      - ../:/app
-    networks:
-      - workshop
+    labels: []
     depends_on:
       postgres:
         condition: service_healthy
       valkey:
         condition: service_healthy
+    develop:
+      watch: []
 
 volumes:
   caddy-data:
