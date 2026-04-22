@@ -33,6 +33,10 @@ services:
         condition: service_healthy
       valkey:
         condition: service_healthy
+    post_start:
+      - command: chown -R www-data:www-data /app/var
+      - command: php bin/console cache:warmup
+        user: www-data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`app.workshop.localhost`)"
