@@ -3,7 +3,7 @@ layout: section
 sectionNumber: '12'
 ---
 
-# Структура воркшопа
+# Структура демо
 
 ---
 
@@ -11,11 +11,10 @@ sectionNumber: '12'
 
 <div class="accent-line"></div>
 
-- **Before & After** — docker-compose.yml (2021) → compose.yml (2026)
-- **Live coding** — PHP 8.4 + PostgreSQL + Valkey + Mailpit + Meilisearch
+- **compose.yml** — современный Docker Compose на практике
+- **Demo** — PHP 8.4 + PostgreSQL + Valkey + Mailpit + Meilisearch
+- **Showcase** — инфраструктурная обвязка: Traefik, S3, Mailpit
 - **Dockerfile** — production-ready с BuildKit фичами
-- **Runtime showdown** — PHP-FPM vs FrankenPHP vs RoadRunner
-- **Observability** — OpenTelemetry + Grafana LGTM
 
 ---
 layout: closing

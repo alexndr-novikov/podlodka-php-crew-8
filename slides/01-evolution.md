@@ -8,16 +8,22 @@ sectionNumber: '01'
 ---
 
 <div class="flex flex-col items-center">
-  <div class="opacity-20 line-through" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--text-muted);">docker-compose.yml</div>
-  <div class="mt-4" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--purple);">compose.yml</div>
+  <div class="flex items-center gap-6" style="flex-wrap: nowrap;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 700; color: #b0b0b0; white-space: nowrap;">docker-compose.yml</div>
+    <div style="font-size: 2.4rem; color: var(--purple);">→</div>
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 700; color: var(--purple); white-space: nowrap;">compose.yml</div>
+  </div>
   <div class="mt-8 text-xl" style="color: var(--text-secondary);">Новое каноничное имя файла. docker-compose.yml всё ещё работает, но deprecated.</div>
 </div>
 
 ---
 
 <div class="flex flex-col items-center">
-  <div class="opacity-20 line-through" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--text-muted);">docker-compose up</div>
-  <div class="mt-4" style="font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; color: var(--purple);">docker compose up</div>
+  <div class="flex items-center gap-6" style="flex-wrap: nowrap;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 700; color: #b0b0b0; white-space: nowrap;">docker-compose up</div>
+    <div style="font-size: 2.4rem; color: var(--purple);">→</div>
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 700; color: var(--purple); white-space: nowrap;">docker compose up</div>
+  </div>
   <div class="mt-8 text-xl text-center" style="color: var(--text-secondary);">V1 (Python) → V2 (Go). Отдельный бинарник → плагин Docker CLI. 2024: V1 окончательно удалён.</div>
 </div>
 
@@ -27,13 +33,12 @@ sectionNumber: '01'
 
 <div class="accent-line"></div>
 
-- `compose.yml` вместо `docker-compose.yml` — новое каноничное имя
-- `docker compose` (встроенная команда) вместо `docker-compose` (deprecated)
-- Compose V2 — Go-реализация, плагин Docker CLI
 - `docker compose watch` — встроенный file-watching
 - `docker compose up --watch` — запуск + watch в одной команде
 - `docker compose up --wait` — ожидание healthcheck
+- `docker compose config` — валидация и вывод итогового YAML
 - `docker compose alpha dry-run` — предпросмотр без запуска
+- `docker compose stats` — ресурсы контейнеров в реальном времени
 
 ---
 layout: default
@@ -131,6 +136,8 @@ services:
 
 Паттерн: `default.env` (в репо) + `override.env` (в .gitignore)
 
+Одинаковые ключи → последний файл в списке побеждает
+
 ---
 
 # Приоритет ENV-переменных
@@ -161,6 +168,7 @@ layout: code-block
 services:
   app:
     post_start:
+      - command: chown -R www-data:www-data /app/var
       - command: php bin/console cache:warmup
         user: www-data
     pre_stop:
@@ -199,7 +207,7 @@ ENV: `COMPOSE_PROFILES=debug,monitoring` в `.env`
 
 <div class="accent-line"></div>
 
-- `service_started` — контейнер запущен (как раньше)
+- `service_started` — контейнер запущен (дефолт при `depends_on: servicename`)
 - `service_healthy` — healthcheck прошёл ✓
 - **`service_completed_successfully`** — завершился с кодом 0 ✓ **(новое!)**
 
@@ -221,3 +229,74 @@ layout: compare
   <CompareCard title="Extend" :items="['extends: { service: php, file: base.yml }', 'Наследование конкретного сервиса', 'Переиспользование базовых конфигов']" />
   <CompareCard title="Include (новый)" :items="['include: [infra.yml, debug.yml]', 'Модульное подключение целых файлов', 'Изолированные пространства']" />
 </div>
+
+---
+layout: code-block
+---
+
+# YAML-якоря — как делали раньше
+
+```yaml
+services:
+  php-base: &php-base
+    image: php:8.4-fpm
+    environment: { APP_ENV: production }
+    volumes: [ ./src:/app/src ]
+
+  php:
+    <<: *php-base
+    ports: [ "9000:9000" ]
+
+  worker:
+    <<: *php-base
+    command: php bin/console messenger:consume
+```
+
+Работает, но: нет наследования между файлами, нечитаемый синтаксис, сложный дебаг
+
+---
+layout: code-block
+---
+
+# extends — наследование сервисов
+
+```yaml
+# base.yml — общая конфигурация
+services:
+  php-base:
+    image: php:8.4-fpm
+    environment: { APP_ENV: production }
+    volumes: [ ./src:/app/src ]
+
+# compose.yml — наследуем и дополняем
+services:
+  php:
+    extends: { service: php-base, file: base.yml }
+    ports: [ "9000:9000" ]
+
+  worker:
+    extends: { service: php-base, file: base.yml }
+    command: php bin/console messenger:consume
+```
+
+---
+layout: code-block
+---
+
+# include — модульная структура
+
+```yaml
+# compose.yml
+include:
+  - compose/app.yml          # PHP + FrankenPHP
+  - compose/database.yml     # PostgreSQL
+  - compose/cache.yml        # Valkey
+  - compose/mail.yml         # Mailpit
+  - compose/search.yml       # Meilisearch
+  - compose/storage.yml      # LocalStack S3
+  - compose/proxy.yml        # Traefik
+  - compose/observability.yml # Grafana LGTM
+
+# Каждый файл — изолированный модуль
+# со своими сервисами, volumes, networks
+```

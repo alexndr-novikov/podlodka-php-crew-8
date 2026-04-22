@@ -18,6 +18,10 @@ This repository is for the Podlodka PHP Crew 8 — a learning/workshop project f
 
 Do NOT add `Co-Authored-By: Claude` to commit messages.
 
+## Slides Workflow
+
+When editing slides, always open Playwright to visually verify changes. After finishing a set of edits, ask the user: close Playwright or continue with the next task?
+
 ## Language
 
 Project documentation is in Russian. Communicate in Russian when discussing project-specific topics unless asked otherwise.

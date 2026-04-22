@@ -7,13 +7,14 @@ sectionNumber: '08'
 
 ---
 
-# Браузерное тестирование
+# Headless-браузеры в контейнерах
 
 <div class="accent-line"></div>
 
-- **Selenium** — standalone-chrome
-- **Playwright** — mcr.microsoft.com
-- **Browserless** — headless Chrome API
+- **Playwright** — E2E-тесты, MCP-сервер для AI-агентов, скриншоты, PDF
+- **Selenium + Codeception** — классика PHP: `standalone-chrome` в compose
+- **Gotenberg** — REST API для генерации PDF (Chromium + LibreOffice)
+- Все запускаются как Docker-сервисы — не нужен браузер на хосте
 
 ---
 
@@ -26,6 +27,33 @@ sectionNumber: '08'
 - Каждый тест получает чистый контейнер — нет shared state
 - Замена моков: тестируем с настоящей БД, а не с фейковой
 - Тренд 2025–2026: Testcontainers стал стандартом для integration tests
+
+---
+layout: code-block
+---
+
+```php
+class DatabaseTest extends TestCase {
+    private static PostgresContainer $container;
+
+    public static function setUpBeforeClass(): void {
+        self::$container = (new PostgresContainer())
+            ->withPostgresUser('test')
+            ->withPostgresPassword('test')
+            ->withPostgresDatabase('testdb')
+            ->start();
+    }
+
+    public function testConnection(): void {
+        $pdo = new \PDO(sprintf(
+            'pgsql:host=%s;port=%d;dbname=testdb',
+            self::$container->getHost(),
+            self::$container->getFirstMappedPort()
+        ), 'test', 'test');
+        $this->assertNotFalse($pdo->query('SELECT 1'));
+    }
+}
+```
 
 ---
 layout: compare

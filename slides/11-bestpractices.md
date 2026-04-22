@@ -18,6 +18,20 @@ sectionNumber: '11'
 - Генерирует production-ready конфигурацию с multi-stage builds
 
 ---
+layout: cover
+class: p-0
+---
+
+<img src="/docker-init.png" class="w-full h-full object-contain bg-[#1e1e2e]" />
+
+---
+layout: cover
+class: p-0
+---
+
+<img src="/docker-init-2.png" class="w-full h-full object-contain bg-[#1e1e2e]" />
+
+---
 
 # Архитектура и конфигурация
 

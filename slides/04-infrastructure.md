@@ -51,6 +51,18 @@ layout: compare
 alt: true
 ---
 
+# Очереди: альтернативы
+
+<div class="comparison-grid">
+  <CompareCard title="SQS (LocalStack)" :items="['AWS-совместимый', 'Через Symfony Messenger', 'Вместе с S3, SNS, Lambda']" />
+  <CompareCard title="Temporal" :items="['Оркестрация вместо очередей', 'Durable workflows', 'temporal-php-sdk']" />
+</div>
+
+---
+layout: compare
+alt: true
+---
+
 # Поиск
 
 <div class="comparison-grid">
@@ -124,3 +136,17 @@ layout: compare
   <CompareCard title="Headless Chrome" :items="['browserless/chrome или Playwright', 'Точная вёрстка — рендерит как браузер', 'Тяжёлый образ (~1 GB)']" />
   <CompareCard title="WeasyPrint" :items="['Python, CSS Paged Media', 'Лёгкий (~100 MB)', 'Ограниченная поддержка JS']" />
 </div>
+
+---
+layout: compare
+---
+
+# Туннели для вебхуков
+
+<div class="comparison-grid">
+  <CompareCard title="ngrok" :items="['Стал платным для большинства кейсов', 'Interstitial-страница мешает вебхукам', 'UI для логов и replay запросов']" />
+  <CompareCard title="Cloudflare Tunnel" :items="['Бесплатный, без ограничений', 'cloudflared tunnel — CLI', 'Нет interstitial, прямой доступ']" />
+  <CompareCard title="Expose (BeyondCode)" :items="['PHP-экосистема (Laravel)', 'Свой сервер или облако (платное)', 'UI для инспекции запросов']" />
+</div>
+
+Запуск через Docker: `docker compose --profile tunnel up`

@@ -41,7 +41,7 @@ class: bg-purple-50/30
 
 <div class="accent-line"></div>
 
-- Замена Nginx / Traefik для локальной разработки
+- Написан на Go, один бинарник — zero dependencies
 - Автоматический HTTPS для локальных доменов
 - Caddyfile — простая декларативная конфигурация
 - Связка: Caddy → PHP-FPM или Caddy через FrankenPHP

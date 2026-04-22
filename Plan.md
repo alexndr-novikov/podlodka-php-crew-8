@@ -1,369 +1,261 @@
-# План воркшопа: Docker для PHP-разработчика в 2026 году
+# Сценарий демонстрации: Docker для PHP-разработчика в 2026
 
-> Фокус: локальное окружение, актуальные практики, современные контейнеры.
-
----
-
-## 1. Эволюция Docker Compose
-
-### 1.1. Формат и CLI
-- `compose.yml` вместо `docker-compose.yml` (новое каноничное имя)
-- `docker compose` (встроенная команда) вместо `docker-compose` (отдельный бинарник на Python, deprecated)
-- Compose V2 — Go-реализация, плагин Docker CLI
-- `docker compose watch` — встроенный file-watching с автоматическим sync/rebuild
-- `docker compose up --wait` — ожидание healthcheck всех сервисов перед выходом
-- `docker compose alpha dry-run` — предпросмотр без запуска
-- `docker compose events` — стриминг событий для отладки
-
-### 1.2. Новый синтаксис и возможности compose.yml
-- `develop.watch` — нативная конфигурация hot-reload (sync, rebuild, sync+restart, restart)
-- `include` — подключение внешних compose-файлов (замена COMPOSE_FILE)
-- `configs` и `secrets` на уровне top-level (без Swarm)
-- Поддержка `profiles` для группировки сервисов (dev, test, debug)
-- `depends_on` с `condition: service_healthy` и `restart: true`
-- Интерполяция переменных: `${VAR:-default}`, `${VAR:?error}`
-- `annotations` — метаданные для сервисов
-- Удаление `version:` — поле больше не нужно и игнорируется
-- `additional_contexts` в build-секции — проброс дополнительных build contexts
-- `cgroup` — настройка cgroup namespace per-service
-
-### 1.3. `develop.watch` — нюансы и подводные камни
-
-**watch vs bind mount — ключевое ограничение:**
-- Compose watch **игнорирует пути, совпадающие с bind mount volumes** — выводит предупреждение `"path '...' also declared by a bind mount volume, this path won't be monitored!"`
-- Причина: одновременный sync + bind mount на одном пути может вызвать бесконечный цикл синхронизации
-- Исключение: действие `rebuild` разрешено вместе с bind mount (не вызывает цикл) — исправлено в [docker/compose#12089](https://github.com/docker/compose/pull/12089)
-- Действие `restart` (без sync) добавлено отдельно для работы с bind mount — [docker/compose#12375](https://github.com/docker/compose/pull/12375). Позволяет перезапускать контейнер при изменении файлов без синхронизации (полезно для Laravel queue workers, Symfony messenger consumers)
-
-**Когда использовать bind mount, а когда watch sync:**
-- **Bind mount** — для локальной разработки на Linux (практически нет overhead), для больших проектов (тысячи файлов), когда нужна двусторонняя синхронизация (генерируемые файлы, vendor)
-- **Watch sync** — для macOS/Windows (быстрее, чем bind mount через виртуализацию), для целенаправленной синхронизации конкретных путей, для одностороннего потока (хост → контейнер)
-- **Watch rebuild** — для файлов, изменение которых требует пересборки образа (composer.json, package.json, Dockerfile)
-- **Watch restart** — для bind mount + перезапуск контейнера при изменении конфигов (e.g. `.env`, `.rr.yaml`, `supervisord.conf`)
-
-**Различия поведения на разных ОС:**
-
-  **macOS:**
-  - Используется `fsevents` API для отслеживания изменений файлов — эффективный, нативный
-  - **Регрессия в Compose v5.0.1 (Docker Desktop 4.57)**: бинарник был скомпилирован без build-тега `fsevents`, fallback-watcher открывал file descriptor на каждую поддиректорию (включая `vendor/`, `node_modules/`), что приводило к краху с ошибкой `too many open files` — исправлено в [docker/compose#13532](https://github.com/docker/compose/pull/13532)
-  - Рекомендация: добавлять `ignore:` секцию в watch для `vendor/`, `node_modules/`, `.git/`, `var/` — снижает нагрузку даже при нативном fsevents
-  - Bind mount на macOS идёт через виртуализацию (VirtioFS / gRPC FUSE) → watch sync может быть быстрее для частых мелких изменений
-
-  **Linux:**
-  - Используется `inotify` — эффективный, но есть системный лимит на количество watchers
-  - `fs.inotify.max_user_watches` по умолчанию 8192–65536 (зависит от дистрибутива) — может не хватить для крупных проектов
-  - Лимит **не изолирован по контейнерам** — все контейнеры + хост делят один пул inotify watches
-  - Решение: `sysctl fs.inotify.max_user_watches=524288` на хосте
-  - Bind mount на Linux работает нативно без overhead → часто предпочтительнее watch sync
-
-  **Windows (WSL2):**
-  - Файлы должны лежать в файловой системе WSL2 (`/home/...`), а не в Windows (`/mnt/c/...`) — иначе inotify-события не приходят
-  - CIFS (Windows FS → Linux) не поддерживает inotify — watch не будет срабатывать на изменения из Windows-редактора, если проект на `/mnt/c/`
-  - Рекомендация: хранить код в WSL2 FS, использовать VS Code Remote WSL
-
-**Общие рекомендации:**
-- Всегда заполняйте `ignore:` — исключайте `vendor/`, `node_modules/`, `.git/`, `var/cache/`, `storage/`
-- Для PHP-проектов `sync` подходит для исходного кода (`src/`, `app/`, `templates/`), `rebuild` — для `composer.json` + `composer.lock`
-- Проверяйте поведение через `docker compose events` — показывает, какие файлы триггерят actions
-- При проблемах: `docker compose watch --no-build` для отладки без пересборки
-
-### 1.4. Compose environments & .env
-- `.env` файл: приоритет, множественные файлы (`env_file: [.env, .env.local]`)
-- `COMPOSE_PROJECT_NAME` и `COMPOSE_PROFILES` в .env
-- `COMPOSE_FILE` с несколькими файлами для overlay-конфигурации
-- Переход от `environment:` к `env_file:` для чистоты конфигурации
+> Демо идёт после слайдовой части. Проект уже развёрнут (`make up`), все сервисы работают.
+> Тайминг: ~15-20 минут.
 
 ---
 
-## 2. Современный Dockerfile для PHP
+## Часть 1: Обзор исходного кода (~8 мин)
 
-### 2.1. Базовые образы
-- Официальные PHP-образы: `php:8.3-fpm`, `php:8.4-fpm`, `php:8.4-cli`
-- Фиксация версий: `php:8.4.2-fpm-bookworm` вместо `php:8.4-fpm`
-- `FROM --platform=$BUILDPLATFORM` для multi-arch
+Показываем в IDE/редакторе. Цель — показать, как всё из слайдов реализовано на практике.
 
-### 2.2. Alpine vs Debian (bookworm) — подводные камни миграции
-- **Размер**: Alpine ~50 MB vs Debian ~250 MB, но после установки расширений разница сокращается
-- **musl vs glibc** — корень большинства проблем:
+### 1.1. compose.yml — модульная структура
 
-  **Imagick / ImageMagick:**
-  - Alpine использует `imagemagick` собранный с musl — другие дефолтные delegates
-  - Отсутствие или неполная поддержка шрифтов: нет `fontconfig` и `ttf-*` пакетов из коробки — текст на изображениях рендерится с fallback-шрифтами или не рендерится вовсе
-  - Различия в цветовых профилях: Alpine-сборка может не включать ICC-профили, что приводит к отличиям в цветопередаче (особенно CMYK → RGB)
-  - `heif`/`avif` delegate может отсутствовать в Alpine-пакете — форматы HEIC/AVIF не конвертируются
-  - Разное поведение при обработке PDF (Ghostscript-версия и policy.xml отличаются)
-  - Решение: явно доустанавливать `fontconfig`, `ttf-freefont`, `ghostscript`, `libheif-dev` и пересобирать или использовать `docker-php-extension-installer`
+**Файл:** `compose.yml`
 
-  **GD:**
-  - Alpine: `libpng`, `libjpeg-turbo`, `freetype` нужно ставить вручную (`apk add`) перед сборкой расширения
-  - Различия в рендеринге шрифтов из-за musl — визуально другой anti-aliasing
+На что обратить внимание:
+- **`include:`** — каждый инфраструктурный сервис в отдельном файле
+- Нет `version:` — поле больше не нужно
+- Одна общая `networks: workshop` — все модули видят друг друга
+- Порядок include не важен — Compose сам разрешает зависимости
 
-  **DNS-резолвинг:**
-  - musl не поддерживает `search` и `ndots` в `/etc/resolv.conf` так же как glibc
-  - В Docker-сетях это может приводить к неожиданным ошибкам при резолве имён сервисов (особенно с точками в имени)
-  - musl DNS-резолвер не использует `/etc/nsswitch.conf` — порядок lookup отличается
+```
+compose.yml           ← точка входа, только include + networks
+compose/proxy.yml     ← Traefik
+compose/database.yml  ← PostgreSQL
+compose/cache.yml     ← Valkey
+compose/search.yml    ← Meilisearch
+compose/mail.yml      ← Mailpit
+compose/storage.yml   ← LocalStack S3 + S3 Manager UI
+compose/app.yml       ← FrankenPHP + Messenger worker
+compose/tunnel.yml    ← Cloudflare/ngrok (profile)
+compose/debug.yml     ← Buggregator (profile)
+compose/test.yml      ← Selenium (profile)
+```
 
-  **Локали и iconv:**
-  - Alpine не поддерживает glibc-локали (`locale-gen` нет) — `setlocale()` работает только с `C` и `POSIX`
-  - `iconv()` в musl — урезанная реализация, может некорректно обрабатывать некоторые кодировки (особенно `CP1251`, `KOI8-R`, актуально для русскоязычных проектов)
-  - Решение: установка `gnu-libiconv` и переопределение `LD_PRELOAD`
+### 1.2. compose/app.yml — ключевой файл
 
-  **Производительность:**
-  - musl `malloc` медленнее glibc `malloc` под высокой нагрузкой и при частых аллокациях (PHP-FPM с большим количеством воркеров)
-  - Решение: можно использовать `jemalloc` как аллокатор
+**Файл:** `compose/app.yml`
 
-  **Совместимость расширений:**
-  - Некоторые PECL-расширения не компилируются на musl без патчей (grpc, protobuf бывали проблемными)
-  - Бинарные расширения, собранные под glibc, не работают на Alpine
+Показать сверху вниз, акценты:
 
-  **Рекомендация:** для production PHP-приложений предпочтительнее Debian (bookworm) — стабильнее, меньше edge-кейсов. Alpine оправдан для микросервисов без тяжёлых расширений или для уменьшения размера финального образа в multi-stage (финальный слой — Alpine CLI без расширений)
+1. **`env_file:` с required/optional** (строки 8-12)
+   - `app.env` — обязательный, в репо
+   - `app.env.local` — опциональный, в .gitignore
+   - Показать `compose/app.env` — всего 2 переменные
+   - «Одинаковые ключи — последний файл побеждает»
 
-### 2.3. Актуальные BuildKit-фичи
-- `RUN --mount=type=cache` — кэш Composer, apt, npm между сборками
-- `RUN --mount=type=secret` — безопасная передача токенов (Composer auth, SSH keys)
-- `RUN --mount=type=ssh` — проброс SSH-агента для приватных репозиториев
-- `RUN --mount=type=bind` — bind файлов с хоста без COPY
-- `COPY --link` — копирование без инвалидации предыдущих слоёв
-- `COPY --chmod` и `COPY --chown` без отдельного RUN
-- Heredoc в Dockerfile (`RUN <<EOF ... EOF`) — многострочные скрипты
-- `ADD --checksum` — верификация скачиваемых файлов
-- Multi-stage builds с `--target` для dev/prod/test
+2. **`environment:` с интерполяцией** (строки 13-27)
+   - `${POSTGRES_USER:-workshop}` — дефолты прямо в compose
+   - Все подключения к инфраструктуре по именам сервисов (postgres, valkey, meilisearch, mailpit, localstack)
 
-### 2.4. Установка PHP-расширений
-- `docker-php-extension-installer` (mlocati) — де-факто стандарт
-- Список типичных расширений: pdo_pgsql, pdo_mysql, redis, intl, gd, zip, opcache, xdebug, pcov, amqp, sockets, excimer
-- Разделение dev/prod расширений через multi-stage
+3. **`depends_on` с `service_healthy`** (строки 34-38)
+   - «App не стартует, пока БД и кэш не пройдут healthcheck»
+   - Перейти к `compose/database.yml` — показать `pg_isready` healthcheck
+   - Перейти к `compose/cache.yml` — показать `valkey-cli ping`
 
-### 2.5. Безопасность
-- Запуск от не-root пользователя
-- Синхронизация UID/GID через build args
-- `USER` инструкция в Dockerfile
-- Минимизация attack surface: удаление dev-пакетов в production
+4. **`post_start` lifecycle hooks** (строки 39-42)
+   - `chown -R www-data:www-data /app/var` — фикс прав
+   - `cache:warmup` от пользователя www-data
+   - «Выполняется после старта, но до того как Traefik начнёт роутить трафик»
 
----
+5. **Traefik labels** (строки 43-48)
+   - `Host(app.workshop.localhost)` — автоматический роутинг
+   - «Traefik читает labels из Docker API — zero config»
 
-## 3. Современные PHP-рантаймы
+6. **`develop.watch`** (строки 49-65)
+   - `sync` для src/, templates/, config/ — мгновенные изменения
+   - `rebuild` для composer.json/lock — пересборка образа
+   - `ignore: ["*.test.php"]` — не синхронизировать тесты
 
-### 3.1. FrankenPHP
-- Встроенный application server на Go (на базе Caddy)
-- Worker mode — PHP-процессы переживают запросы (аналог RoadRunner)
-- Нативная поддержка HTTP/2, HTTP/3
-- Автоматический HTTPS через Let's Encrypt / локальные сертификаты
-- Early Hints (103)
-- Официальный образ `dunglas/frankenphp`
-- Интеграция с Symfony (symfony/runtime) и Laravel (Octane)
-- Mercure (real-time) и Vulcain (preloading) из коробки
+7. **`extends` для worker** (строки 67-79)
+   - «worker-messenger наследует всё от app — build, environment, volumes»
+   - `command:` переопределяет CMD на `messenger:consume`
+   - `labels: []` — сбрасывает Traefik (worker не нужен в proxy)
+   - `develop.watch: []` — сбрасывает watch
 
-### 3.2. Caddy как reverse proxy
-- Замена Nginx / Traefik для локальной разработки
-- Автоматический HTTPS для локальных доменов
-- Caddyfile vs JSON-конфигурация
-- Связка: Caddy → PHP-FPM или Caddy через FrankenPHP
+### 1.3. compose/proxy.yml — Traefik
 
-### 3.3. RoadRunner
-- Application server на Go с PHP-воркерами
-- gRPC, WebSocket, Centrifuge, Jobs (очереди), KV, Metrics
-- Образ `ghcr.io/roadrunner-server/roadrunner`
-- Интеграция со Spiral Framework, Laravel (Octane), Symfony
+**Файл:** `compose/proxy.yml`
 
-### 3.4. Сравнение подходов
-- Классический стек: Nginx + PHP-FPM
-- FrankenPHP (Caddy + embedded PHP)
-- RoadRunner (Go app server + PHP workers)
-- Swoole / OpenSwoole (async PHP-расширение)
-- Когда что использовать, плюсы и минусы для локальной разработки
+- Docker socket прокинут read-only
+- Конфиг через volumes: `traefik.yml`, `dynamic.yml`, TLS-сертификаты
+- `${HTTP_PORT:-80}` и `${HTTPS_PORT:-443}` — порты настраиваемые через .env
 
----
+Бегло показать `docker/traefik/traefik.yml`:
+- `providers.docker` — автодискавери по сети workshop
+- `entryPoints.web` → redirect на websecure
+- `entryPoints.websecure` → :443
 
-## 4. Контейнеры для инфраструктуры
+### 1.4. compose/storage.yml — LocalStack + S3 Manager
 
-### 4.1. Базы данных
-- **PostgreSQL** — `postgres:17` (замена MySQL как default в Laravel 11+)
-- **MySQL** — `mysql:8.4` / `mysql:9.0`
-- **MariaDB** — `mariadb:11`
-- **MongoDB** — `mongo:8`
-- **Healthcheck** для каждой БД (pg_isready, mysqladmin ping)
-- Named volumes для персистентности данных
-- Инициализация через `/docker-entrypoint-initdb.d/`
+**Файл:** `compose/storage.yml`
 
-### 4.2. Кэш и очереди
-- **Redis** — `redis:7` с `redis-stack` для RedisInsight/RedisSearch/RedisJSON
-- **Valkey** — `valkey/valkey:8` (fork Redis после смены лицензии, drop-in замена)
-- **KeyDB** — `eqalpha/keydb` (многопоточный Redis-совместимый)
-- **DragonflyDB** — `docker.dragonflydb.io/dragonflydb/dragonfly` (высокопроизводительная замена Redis)
-- **RabbitMQ** — `rabbitmq:4-management`
-- **Apache Kafka** — `bitnami/kafka` (KRaft mode без ZooKeeper) / `apache/kafka`
-- **NATS** — `nats:2` — легковесная альтернатива для pub/sub и очередей
+- `SERVICES: s3` — запускаем только S3
+- Healthcheck: `curl -f http://localhost:4566/_localstack/health`
+- Init-скрипт: `docker/localstack/init-s3.sh` → `awslocal s3 mb s3://workshop-uploads`
+- **s3manager** — UI для просмотра бакетов, зависит от localstack healthy
 
-### 4.3. Поиск
-- **Meilisearch** — `getmeili/meilisearch:v1` (рекомендация Laravel Scout)
-- **Typesense** — `typesense/typesense:27` (альтернатива)
-- **Elasticsearch** — `elasticsearch:8` (для сложных случаев)
-- **OpenSearch** — `opensearchproject/opensearch:2` (open-source fork Elasticsearch)
-- **Manticore Search** — `manticoresearch/manticore` (лёгкая альтернатива, бывший Sphinx)
+### 1.5. compose/tunnel.yml — profiles
 
-### 4.4. Почта
-- **Mailpit** — `axllent/mailpit` (замена MailHog, который unmaintained)
-  - Современный UI, поддержка HTML-preview
-  - SMTP на порту 1025, веб-интерфейс на 8025
-  - Поддержка POP3
-  - API для интеграционных тестов
-- Почему не MailHog: проект заброшен с 2022, не обновляется
+**Файл:** `compose/tunnel.yml`
 
-### 4.5. Объектное хранилище (S3)
-- **LocalStack** — `localstack/localstack` (S3, SQS, SNS, DynamoDB, Lambda и др.)
-  - Эмуляция полной экосистемы AWS
-  - Community edition бесплатен
-- **MinIO** — `minio/minio` (по-прежнему хорош для чистого S3)
-- Когда LocalStack vs MinIO: если нужен только S3 — MinIO проще; если нужны SQS/SNS/Lambda — LocalStack
+- `profiles: [tunnel]` — не запускается по умолчанию
+- `docker compose --profile tunnel up -d` или `make tunnel`
+- Cloudflare: бесплатный, без регистрации, без interstitial
+- ngrok: требует NGROK_AUTHTOKEN
 
-### 4.6. Reverse proxy и маршрутизация
-- **Caddy** — `caddy:2` (автоматический HTTPS, простая конфигурация)
-- **Traefik** — `traefik:v3` (автоматический service discovery по Docker labels)
-- **Nginx Proxy Manager** — `jc21/nginx-proxy-manager` (UI для управления)
-- Локальные домены: `*.localhost`, `*.test` + mkcert для доверенного HTTPS
+### 1.6. Dockerfile — multi-stage
 
----
+**Файл:** `docker/frankenphp/Dockerfile`
 
-## 5. Контейнеры для разработки и отладки
+Показать 3 стадии:
 
-### 5.1. Xdebug 3
-- Настройка через переменные окружения (`XDEBUG_MODE`, `XDEBUG_CONFIG`)
-- Modes: debug, profile, trace, coverage
-- `xdebug.client_host=host.docker.internal`
-- Включение/выключение через profiles или отдельный Dockerfile target
+1. **base** (строки 3-50)
+   - `dunglas/frankenphp:1-php8.4-bookworm` — FrankenPHP на Debian
+   - Heredoc `RUN <<-EOF` для apt-get
+   - `install-php-extensions` — mlocati installer
+   - `COPY --link` — копирование без инвалидации слоёв
+   - `COPY --chmod=755` — права без отдельного RUN
+   - `HEALTHCHECK` — встроенный health через Caddy metrics
+   - `ENTRYPOINT` → docker-entrypoint.sh
 
-### 5.2. Профилирование и мониторинг
-- **Excimer** — PHP-расширение для low-overhead profiling (используется Wikipedia)
-- **SPX** — простой профилировщик с веб-UI
-- **Buggregator** — `ghcr.io/buggregator/server` (all-in-one debug server для PHP)
-  - Сборщик Xdebug, VarDumper (Symfony), Ray, SMTP, Sentry, Inspector, Profiler
-  - Trap — CLI-альтернатива
-- **Grafana + Prometheus** — мониторинг (если нужен)
+2. **dev** (строки 52-70)
+   - Добавляет xdebug, pcov
+   - `php.ini-development`
+   - `--watch` флаг в CMD
+   - Комментарий про non-root: «dev работает от root — FrankenPHP требует»
 
-### 5.3. Инструменты качества кода (в контейнерах)
-- PHPStan / Psalm — статический анализ
-- PHP CS Fixer / PHP_CodeSniffer — code style
-- Rector — автоматический рефакторинг
-- Запуск через `docker compose run` или как отдельные сервисы
+3. **prod** (строки 72-95)
+   - `php.ini-production`
+   - `COPY --link composer.json composer.lock` → отдельный слой
+   - `--mount=type=cache,target=/root/.composer/cache` — кэш между сборками
+   - `composer install --no-dev` → `dump-autoload --classmap-authoritative`
+   - `USER www-data` — non-root в production
+
+### 1.7. docker-entrypoint.sh — умный запуск
+
+**Файл:** `docker/frankenphp/docker-entrypoint.sh`
+
+- Автоматический `composer install` если нет vendor/
+- Ожидание БД через PDO (30 секунд timeout)
+- Автомиграции в dev-режиме
+- «Всё что нужно для первого запуска — `make up` и готово»
+
+### 1.8. Makefile — developer experience
+
+**Файл:** `Makefile`
+
+- `make help` — автогенерация справки
+- `make setup` — mkcert сертификаты + .env.local
+- `make up` → `docker compose up -d --wait`
+- `make watch` — hot-reload
+- `make tunnel` — Cloudflare tunnel через profile
+- `make lint` — PHPStan + CS Fixer в контейнере
 
 ---
 
-## 6. Workflow-движки и фоновые задачи
+## Часть 2: Терминал — запуск и CLI (~3 мин)
 
-### 6.1. Temporal
-- `temporalio/auto-setup` — сервер с автоматической настройкой
-- `temporalio/ui` — веб-интерфейс
-- PHP SDK (`temporal/sdk`) — workflow и activity в PHP
-- Связка: Temporal server + PHP worker в отдельном контейнере
-- Альтернативы: Symfony Messenger, Laravel Horizon
+### 2.1. docker compose config
 
-### 6.2. Supervisor / Process Manager
-- `supervisord` внутри контейнера для worker-процессов (queue consumers, schedulers)
-- Альтернатива: отдельные контейнеры для каждого воркера (предпочтительнее)
-- Laravel: `php artisan queue:work` как отдельный сервис
-- Symfony: `messenger:consume` как отдельный сервис
+```bash
+docker compose config --services
+```
 
----
+Показать список всех сервисов. Обратить внимание, что tunnel/debug/selenium не в списке — они за profiles.
 
-## 7. Observability Stack (локально)
+### 2.2. docker compose ps
 
-### 7.1. OpenTelemetry
-- PHP SDK (`open-telemetry/sdk`, авто-инструментирование)
-- OTel Collector — `otel/opentelemetry-collector-contrib`
-- Traces, Metrics, Logs — единый стандарт
+```bash
+docker compose ps
+```
 
-### 7.2. Трейсинг
-- **Jaeger** — `jaegertracing/all-in-one` (визуализация трейсов)
-- **Zipkin** — `openzipkin/zipkin` (альтернатива)
-- **Grafana Tempo** — `grafana/tempo` (хранение трейсов для Grafana)
+Показать запущенные сервисы, их порты, статус healthcheck (healthy).
 
-### 7.3. Логирование
-- **Grafana Loki** — `grafana/loki` (агрегация логов, label-based)
-- Docker logging driver → Loki
-- **Grafana** — `grafana/grafana` (единый UI для логов, метрик, трейсов)
+### 2.3. docker compose stats (если время есть)
 
-### 7.4. All-in-one
-- **Grafana LGTM Stack** — `grafana/otel-lgtm` (Loki + Grafana + Tempo + Mimir в одном контейнере для локальной разработки)
+```bash
+docker compose stats
+```
+
+Показать потребление ресурсов каждым сервисом в реальном времени. Ctrl+C для выхода.
 
 ---
 
-## 8. CI/CD и тестирование
+## Часть 3: Браузер — демонстрация работы (~7 мин)
 
-### 8.1. Генерация PDF
-- **Gotenberg** — `gotenberg/gotenberg:8` (Chromium + LibreOffice, REST API)
-- Альтернатива wkhtmltopdf (deprecated)
+Все URL через HTTPS с доверенными сертификатами (mkcert).
 
-### 8.2. Браузерное тестирование
-- **Selenium** — `selenium/standalone-chrome`
-- **Playwright** — `mcr.microsoft.com/playwright`
-- **Browserless** — `browserless/chrome` (headless Chrome API)
-- Laravel Dusk / Symfony Panther интеграция
+### 3.1. Dashboard
 
-### 8.3. Аудит и безопасность образов
-- **Hadolint** — линтер Dockerfile
-- **Dockle** — аудит безопасности образов
-- **Trivy** — сканер уязвимостей (CVE)
-- **Docker Scout** — встроенный в Docker Desktop анализ (SBOM, CVE)
-- **Grype** + **Syft** — open-source альтернатива от Anchore
+**URL:** `https://app.workshop.localhost:8443`
 
----
+- Главная страница с карточками: Email, Storage, Search, Cache, Webhooks, Onboarding
+- Каждая карточка ведёт к демо конкретного Docker-сервиса
+- «Одно приложение — 6 интеграций с инфраструктурой, всё через Docker»
 
-## 9. Docker Desktop и альтернативы (2026)
+### 3.2. Email → Mailpit
 
-- **Docker Desktop** — встроенный Compose, Scout, Extensions, Resource Saver
-- **OrbStack** — лёгкая альтернатива для macOS (быстрее, меньше ресурсов)
-- **Podman Desktop** — open-source альтернатива (rootless, daemonless)
-- **Colima** — CLI-ориентированный Docker runtime для macOS/Linux
-- Файловая синтаксис: VirtioFS (Docker Desktop), virtiofs (OrbStack) — решение проблемы медленных volume-mount на macOS
+1. Перейти в **Email** на дашборде
+2. Заполнить форму, отправить email
+3. Открыть **Mailpit UI**: `https://mailpit.workshop.localhost:8443`
+4. Показать полученное письмо, HTML-preview
+5. «SMTP на порту 1025, UI на 8025, через Traefik — красивый URL»
 
----
+### 3.3. Storage → S3 (LocalStack)
 
-## 10. Референсные реализации из экосистемы
+1. Перейти в **Хранилище (S3)** на дашборде
+2. Загрузить файл
+3. Показать его в списке, удалить
+4. Открыть **S3 Manager UI**: `https://s3.workshop.localhost:8443`
+5. Показать бакет `workshop-uploads`, загруженные файлы
+6. «LocalStack эмулирует AWS S3. Init-скрипт создаёт бакет при старте»
 
-### Laravel
-- **Laravel Sail** — официальное Docker-окружение (compose.yml с MySQL/PostgreSQL/Redis/Meilisearch/Mailpit/Selenium)
-- **Laravel Octane** — FrankenPHP / RoadRunner / Swoole в production-like режиме
-- **Laravel Herd** — нативная локальная среда (без Docker, для сравнения)
-- Переход на PostgreSQL как default DB в Laravel 11
+### 3.4. Search → Meilisearch
 
-### Symfony
-- **Symfony Docker** (dunglas/symfony-docker) — официальный стек на FrankenPHP
-- **Symfony CLI** — встроенный локальный сервер (без Docker, для сравнения)
-- **Symfony Messenger** — очереди через RabbitMQ/Redis/Doctrine
-- **Symfony Runtime** — интеграция с FrankenPHP/RoadRunner
+1. Перейти в **Поиск** на дашборде
+2. Добавить документ (имя, email)
+3. Выполнить поиск — показать мгновенные результаты
+4. «Meilisearch v1 — рекомендация Laravel Scout, typo-tolerance из коробки»
 
-### Другие
-- **DDEV** — универсальное Docker-окружение для PHP (Drupal, WordPress, Laravel, Symfony)
-- **Lando** — ещё один Docker-based dev environment
+### 3.5. Traefik Dashboard
 
----
+**URL:** `https://traefik.workshop.localhost:8443/dashboard/`
 
-## 11. Best Practices 2026
+- Показать список роутеров: app, mailpit, s3manager, meilisearch
+- Показать entrypoints: web (redirect), websecure (TLS)
+- «Вся маршрутизация через Docker labels — ничего не настраиваем руками»
 
-- Один процесс — один контейнер
-- Healthcheck для каждого сервиса
-- Named volumes для данных, bind mounts для кода
-- `.dockerignore` — обязательно
-- Multi-stage builds: dev → test → production
-- `develop.watch` вместо сторонних file-watchers
-- `profiles` для опциональных сервисов (xdebug, mailpit, adminer)
-- Compose `include` для модульности
-- Кэширование зависимостей через `--mount=type=cache`
-- Pinning версий образов до минорной версии
-- Non-root user в контейнерах
-- `docker compose up --wait` в скриптах и CI
-- `.env` + `.env.local` для разделения конфигурации
-- Makefile / Taskfile / Just для алиасов команд
+### 3.6. Onboarding — сквозной сценарий (если время есть)
+
+1. Перейти в **Onboarding** на дашборде
+2. Зарегистрировать пользователя
+3. «Один запрос → БД + async email (Messenger → Valkey → Worker) + S3 аватар + Meilisearch индекс»
+4. Проверить: письмо в Mailpit, файл в S3 Manager, документ в поиске
 
 ---
 
-## 12. Структура воркшопа (предложение)
+## Часть 4: Tunnel — бонус (~2 мин, если есть время)
 
-1. **Before & After** — показать `docker-compose.yml` образца 2021 и `compose.yml` образца 2026
-2. **Live coding** — собрать окружение с нуля: PHP 8.4 + PostgreSQL + Redis/Valkey + Mailpit + Meilisearch
-3. **Dockerfile** — написать production-ready Dockerfile с BuildKit фичами
-4. **Runtime showdown** — PHP-FPM vs FrankenPHP vs RoadRunner (запуск одного приложения)
-5. **Observability** — подключить OpenTelemetry + Grafana LGTM stack
-6. **Temporal** — показать workflow engine для фоновых задач
-7. **Q&A / Discussion**
+```bash
+make tunnel
+```
+
+- Показать URL от Cloudflare в логах
+- Открыть URL с телефона / дать ссылку аудитории
+- «Бесплатно, без регистрации, удобно для тестирования вебхуков»
+
+---
+
+## Чеклист перед выступлением
+
+- [ ] `make up` — все сервисы запущены
+- [ ] `make seed` — тестовые данные в БД и Meilisearch
+- [ ] `https://app.workshop.localhost:8443` — открывается
+- [ ] `https://mailpit.workshop.localhost:8443` — открывается
+- [ ] `https://s3.workshop.localhost:8443` — открывается
+- [ ] `https://traefik.workshop.localhost:8443/dashboard/` — открывается
+- [ ] IDE открыта на compose.yml
+- [ ] Терминал в директории проекта
+- [ ] Слайды на слайде 12 (Структура демо) перед началом демо-части
