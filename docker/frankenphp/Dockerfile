@@ -35,7 +35,6 @@ RUN install-php-extensions \
 
 # PHP extensions — additional (heavier builds)
 RUN install-php-extensions \
-    amqp \
     imagick
 
 # PHP extensions — observability (uncomment when needed, grpc takes ~10min to compile)
