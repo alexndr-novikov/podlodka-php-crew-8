@@ -72,3 +72,28 @@ EOF
 COPY --link docker/frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch"]
+
+# --- Prod ---
+FROM base AS prod
+
+ENV APP_ENV=prod
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+# Install dependencies (no dev packages, optimized autoloader)
+COPY --link composer.json composer.lock symfony.lock ./
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer install --no-dev --no-scripts --prefer-dist --no-progress
+
+# Copy application code
+COPY --link . /app
+
+RUN <<-EOF
+    composer dump-autoload --classmap-authoritative --no-dev
+    php bin/console cache:warmup
+    chown -R www-data:www-data /app/var
+EOF
+
+USER www-data
+
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
