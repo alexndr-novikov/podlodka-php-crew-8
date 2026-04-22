@@ -53,14 +53,6 @@ class DashboardController extends AbstractController
                 'serviceUrl' => null,
             ],
             [
-                'title' => 'Observability',
-                'description' => 'Трейсы, логи, метрики через OpenTelemetry',
-                'route' => 'observability_index',
-                'icon' => "\u{1F4CA}",
-                'service' => 'Grafana',
-                'serviceUrl' => 'https://grafana.workshop.localhost:8443',
-            ],
-            [
                 'title' => 'Onboarding',
                 'description' => 'Сквозной сценарий: регистрация пользователя',
                 'route' => 'onboarding_index',
