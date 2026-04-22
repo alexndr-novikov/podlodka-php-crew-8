@@ -37,12 +37,6 @@ RUN install-php-extensions \
 RUN install-php-extensions \
     imagick
 
-# PHP extensions — observability (uncomment when needed, grpc takes ~10min to compile)
-# RUN install-php-extensions \
-#     grpc \
-#     protobuf \
-#     opentelemetry
-
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
@@ -61,6 +55,8 @@ FROM base AS dev
 ENV APP_ENV=dev
 ENV XDEBUG_MODE=off
 ENV FRANKENPHP_WORKER_CONFIG=watch
+# Note: dev runs as root because FrankenPHP needs it for auto-HTTPS/binding
+# Production stage uses USER www-data (see prod target)
 
 RUN <<-EOF
     mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
