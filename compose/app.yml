@@ -5,10 +5,13 @@ services:
       dockerfile: docker/frankenphp/Dockerfile
       target: dev
     restart: unless-stopped
+    env_file:
+      - path: ./app.env
+        required: true
+      - path: ./app.env.local
+        required: false
     environment:
       SERVER_NAME: ":8080"
-      APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${APP_SECRET:-workshop-secret-change-me}
       DATABASE_URL: "postgresql://${POSTGRES_USER:-workshop}:${POSTGRES_PASSWORD:-workshop}@postgres:5432/${POSTGRES_DB:-workshop}?serverVersion=${POSTGRES_VERSION:-17}&charset=utf8"
       MESSENGER_TRANSPORT_DSN: "redis://valkey:6379/messages"
       VALKEY_URL: ${VALKEY_URL:-redis://valkey:6379}

@@ -40,4 +40,4 @@ Thumbs.db
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 .playwright-mcp
-slides/index.html
+slides/index.htmlcompose/app.env.local
