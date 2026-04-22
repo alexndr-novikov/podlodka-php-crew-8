@@ -69,6 +69,12 @@ services:
       service: app
     restart: unless-stopped
     command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600", "-vv"]
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /proc/1/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels: []
     depends_on:
       postgres:
