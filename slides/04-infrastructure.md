@@ -84,20 +84,28 @@ alt: true
 - API для интеграционных тестов
 
 ---
-layout: default
-class: bg-purple-50/30
+layout: compare
 ---
 
-# S3: LocalStack vs MinIO
+# S3-совместимые хранилища
 
-<div class="accent-line"></div>
-
-<div class="two-col-custom">
-  <CompareCard title="LocalStack" :items="['S3, SQS, SNS, DynamoDB, Lambda', 'Полная эмуляция AWS', 'Community edition бесплатен']" />
-  <CompareCard title="MinIO" :items="['Чистый S3-совместимый', 'Проще в настройке', 'Легче по ресурсам']" />
+<div class="comparison-grid">
+  <CompareCard title="MinIO" :items="['Чистый S3-совместимый', 'Проще всех в настройке', 'Легче по ресурсам']" />
+  <CompareCard title="SeaweedFS" :items="['S3 + распределённая FS', 'Filer, mount, tiering', 'Быстрее MinIO на больших файлах']" />
+  <CompareCard title="Garage" :items="['Rust, geo-distributed', 'Минимальные ресурсы', 'Self-hosted альтернатива R2']" />
 </div>
 
-Только S3 → MinIO. Нужны SQS/SNS/Lambda → LocalStack.
+---
+layout: compare
+alt: true
+---
+
+# S3-совместимые хранилища
+
+<div class="comparison-grid">
+  <CompareCard title="RustFS" :items="['Rust-реализация S3 API', 'Совместим с MinIO SDK', 'Молодой, но перспективный']" />
+  <CompareCard title="LocalStack" :items="['S3, SQS, SNS, DynamoDB, Lambda', 'Полная эмуляция AWS', 'Community edition бесплатен']" />
+</div>
 
 ---
 

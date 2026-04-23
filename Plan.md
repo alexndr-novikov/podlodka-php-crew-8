@@ -68,11 +68,16 @@ compose/test.yml      ← Selenium (profile)
    - `rebuild` для composer.json/lock — пересборка образа
    - `ignore: ["*.test.php"]` — не синхронизировать тесты
 
-7. **`extends` для worker** (строки 67-79)
-   - «worker-messenger наследует всё от app — build, environment, volumes»
+7. **`extends` + `!reset` для worker** (строки 67-81)
+   - «worker-messenger наследует всё от app — build, environment, volumes, depends_on»
    - `command:` переопределяет CMD на `messenger:consume`
-   - `labels: []` — сбрасывает Traefik (worker не нужен в proxy)
-   - `develop.watch: []` — сбрасывает watch
+   - `healthcheck:` переопределяет Caddy-проверку на проверку процесса
+   - **`!reset`** — ключевой момент для демо:
+     - `labels: !reset []` — сбрасывает Traefik-лейблы (worker не должен быть в proxy)
+     - `post_start: !reset []` — сбрасывает chown/warmup (worker не нужен warmup)
+     - `develop: !reset` — сбрасывает watch (worker использует bind mount)
+   - «extends мержит mappings и аппендит sequences — без `!reset` лейблы и хуки наследуются»
+   - «depends_on наследуется как mapping — дублировать не нужно»
 
 ### 1.3. compose/proxy.yml — Traefik
 
@@ -183,13 +188,26 @@ docker compose stats
 
 ---
 
+## Быстрые ссылки
+
+| Сервис | URL |
+|--------|-----|
+| Dashboard | https://app.workshop.localhost |
+| Mailpit | https://mailpit.workshop.localhost |
+| S3 Manager | https://s3.workshop.localhost |
+| Meilisearch | https://search.workshop.localhost |
+| Webhooks Live | https://app.workshop.localhost/webhook |
+| Traefik | https://traefik.workshop.localhost/dashboard/ |
+
+---
+
 ## Часть 3: Браузер — демонстрация работы (~7 мин)
 
 Все URL через HTTPS с доверенными сертификатами (mkcert).
 
 ### 3.1. Dashboard
 
-**URL:** `https://app.workshop.localhost:8443`
+**URL:** `https://app.workshop.localhost`
 
 - Главная страница с карточками: Email, Storage, Search, Cache, Webhooks, Onboarding
 - Каждая карточка ведёт к демо конкретного Docker-сервиса
@@ -199,7 +217,7 @@ docker compose stats
 
 1. Перейти в **Email** на дашборде
 2. Заполнить форму, отправить email
-3. Открыть **Mailpit UI**: `https://mailpit.workshop.localhost:8443`
+3. Открыть **Mailpit UI**: `https://mailpit.workshop.localhost`
 4. Показать полученное письмо, HTML-preview
 5. «SMTP на порту 1025, UI на 8025, через Traefik — красивый URL»
 
@@ -208,7 +226,7 @@ docker compose stats
 1. Перейти в **Хранилище (S3)** на дашборде
 2. Загрузить файл
 3. Показать его в списке, удалить
-4. Открыть **S3 Manager UI**: `https://s3.workshop.localhost:8443`
+4. Открыть **S3 Manager UI**: `https://s3.workshop.localhost`
 5. Показать бакет `workshop-uploads`, загруженные файлы
 6. «LocalStack эмулирует AWS S3. Init-скрипт создаёт бакет при старте»
 
@@ -221,7 +239,7 @@ docker compose stats
 
 ### 3.5. Traefik Dashboard
 
-**URL:** `https://traefik.workshop.localhost:8443/dashboard/`
+**URL:** `https://traefik.workshop.localhost/dashboard/`
 
 - Показать список роутеров: app, mailpit, s3manager, meilisearch
 - Показать entrypoints: web (redirect), websecure (TLS)
@@ -236,15 +254,34 @@ docker compose stats
 
 ---
 
-## Часть 4: Tunnel — бонус (~2 мин, если есть время)
+## Часть 4: Webhooks Live + Tunnel (~5 мин)
+
+### 4.1. Запуск tunnel
 
 ```bash
 make tunnel
+docker compose logs cloudflared 2>&1 | grep trycloudflare
 ```
 
-- Показать URL от Cloudflare в логах
-- Открыть URL с телефона / дать ссылку аудитории
-- «Бесплатно, без регистрации, удобно для тестирования вебхуков»
+Скопировать URL вида `https://xxx-yyy.trycloudflare.com`.
+
+### 4.2. Демо на странице Webhooks
+
+**URL:** `https://app.workshop.localhost/webhook`
+
+1. Вставить tunnel URL в поле на странице — curl обновится автоматически
+2. Отправить тестовый вебхук из формы — появится в Live Feed
+3. Показать curl аудитории — «скопируйте и отправьте, ваше сообщение появится на экране»
+4. Дать curl в чат / на экран — подождать пока зрители отправят
+5. Наблюдать за лентой в реальном времени (polling каждые 2 сек)
+6. «POST через публичный URL → Cloudflare → Docker-контейнер → Valkey → Live Feed»
+
+### 4.3. Что происходит под капотом
+
+- Cloudflare Tunnel проксирует запросы на `app:8080` внутри Docker-сети
+- Вебхуки сохраняются в Valkey (кэш) — последние 50 записей
+- Страница опрашивает `/webhook/feed` каждые 2 секунды
+- «Бесплатно, без регистрации, без interstitial-страницы»
 
 ---
 
@@ -252,10 +289,10 @@ make tunnel
 
 - [ ] `make up` — все сервисы запущены
 - [ ] `make seed` — тестовые данные в БД и Meilisearch
-- [ ] `https://app.workshop.localhost:8443` — открывается
-- [ ] `https://mailpit.workshop.localhost:8443` — открывается
-- [ ] `https://s3.workshop.localhost:8443` — открывается
-- [ ] `https://traefik.workshop.localhost:8443/dashboard/` — открывается
+- [ ] `https://app.workshop.localhost` — открывается
+- [ ] `https://mailpit.workshop.localhost` — открывается
+- [ ] `https://s3.workshop.localhost` — открывается
+- [ ] `https://traefik.workshop.localhost/dashboard/` — открывается
 - [ ] IDE открыта на compose.yml
 - [ ] Терминал в директории проекта
 - [ ] Слайды на слайде 12 (Структура демо) перед началом демо-части

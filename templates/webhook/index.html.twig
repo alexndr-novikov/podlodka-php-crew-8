@@ -4,74 +4,157 @@
 
 {% block body %}
     <div class="mb-8">
-        <h1 class="section-title text-3xl gradient-text">Webhooks</h1>
-        <p class="section-subtitle">Приём вебхуков через Cloudflare Tunnel с полным roundtrip</p>
+        <h1 class="section-title text-3xl gradient-text">Webhooks Live</h1>
+        <p class="section-subtitle">Отправьте POST — он появится здесь в реальном времени</p>
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div class="space-y-6">
             <div class="glass-card p-6">
-                <h2 class="text-lg font-semibold text-pod-text font-display mb-4">Roundtrip Test</h2>
-                <p class="text-sm text-pod-text-muted mb-4">
-                    Отправляет POST через публичный tunnel URL обратно на этот сервер.
-                    Требует запущенный tunnel: <code class="pod-code">make tunnel</code>
-                </p>
-                <form method="post" action="{{ path('webhook_send_test') }}" class="space-y-4">
+                <h2 class="text-lg font-semibold text-pod-text font-display mb-4">curl для аудитории</h2>
+                <p class="text-sm text-pod-text-muted mb-3">Скопируйте и отправьте — ваше сообщение появится на экране:</p>
+                <div class="mb-3">
+                    <label for="tunnel-url" class="block text-xs font-medium text-pod-text-muted mb-1">Tunnel URL</label>
+                    <input type="url" id="tunnel-url" placeholder="https://xxx-yyy.trycloudflare.com" class="pod-input text-sm" oninput="updateCurl()">
+                    <p class="mt-1.5 text-xs text-pod-text-dim">Получить URL: <code class="pod-code">docker compose logs cloudflared 2>&1 | grep trycloudflare</code></p>
+                </div>
+                <div class="relative">
+                    <pre id="curl-cmd" class="bg-gray-900 text-green-400 text-xs p-4 rounded-lg overflow-x-auto font-mono leading-relaxed"></pre>
+                    <button id="copy-btn" onclick="copyCmd()" class="absolute top-2 right-2 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 px-2 py-1 rounded transition-colors">Copy</button>
+                </div>
+            </div>
+
+            <div class="glass-card p-6">
+                <h2 class="text-lg font-semibold text-pod-text font-display mb-4">Отправить из браузера</h2>
+                <form method="post" action="{{ path('webhook_test') }}" id="send-form" class="space-y-3">
                     <div>
-                        <label for="tunnel_url" class="block text-sm font-medium text-pod-text-muted mb-1.5">Tunnel URL</label>
-                        <input type="url" name="tunnel_url" id="tunnel_url"
-                               placeholder="https://xxx-yyy.trycloudflare.com"
-                               class="pod-input">
-                        <p class="mt-1.5 text-xs text-pod-text-dim">Скопируйте URL из логов cloudflared: <code class="pod-code">docker compose --profile tunnel logs cloudflared</code></p>
+                        <input type="text" name="name" placeholder="Имя" class="pod-input" id="field-name">
                     </div>
-                    <button type="submit" class="pod-btn pod-btn-primary">Send Test Webhook</button>
+                    <div>
+                        <input type="text" name="message" placeholder="Сообщение" class="pod-input" id="field-message">
+                    </div>
+                    <button type="submit" class="pod-btn pod-btn-primary">Отправить</button>
                 </form>
             </div>
 
             <div class="glass-card p-6">
                 <h2 class="text-lg font-semibold text-pod-text font-display mb-4">Endpoints</h2>
-                <dl class="space-y-4 text-sm">
+                <dl class="space-y-3 text-sm">
                     <div>
                         <dt class="font-medium text-pod-text font-mono text-xs">POST /webhook/test</dt>
-                        <dd class="text-pod-text-muted mt-0.5">Echo endpoint — возвращает полученный payload</dd>
+                        <dd class="text-pod-text-muted mt-0.5">Принимает JSON, сохраняет в Valkey, выводит в ленту</dd>
                     </div>
                     <div>
-                        <dt class="font-medium text-pod-text font-mono text-xs">POST /webhook/stripe</dt>
-                        <dd class="text-pod-text-muted mt-0.5">Имитация Stripe webhook — диспатчит в Messenger</dd>
+                        <dt class="font-medium text-pod-text font-mono text-xs">GET /webhook/feed</dt>
+                        <dd class="text-pod-text-muted mt-0.5">JSON-лента последних 50 вебхуков (polling)</dd>
                     </div>
                 </dl>
+                <form method="post" action="{{ path('webhook_clear') }}" class="mt-4">
+                    <button type="submit" class="text-xs text-red-400 hover:text-red-300 transition-colors">Очистить ленту</button>
+                </form>
             </div>
         </div>
 
-        <div class="glass-card p-6 h-fit">
-            <h2 class="text-lg font-semibold text-pod-text font-display mb-5">Как использовать</h2>
-            <ol class="space-y-4 text-sm text-pod-text-muted">
-                <li class="flex gap-3">
-                    <span class="font-bold text-pod-purple-light font-display">1.</span>
-                    <div>
-                        Запустите tunnel:
-                        <div class="pod-code-block">make tunnel</div>
-                    </div>
-                </li>
-                <li class="flex gap-3">
-                    <span class="font-bold text-pod-purple-light font-display">2.</span>
-                    <div>
-                        Скопируйте URL из логов:
-                        <div class="pod-code-block">docker compose --profile tunnel logs cloudflared</div>
-                    </div>
-                </li>
-                <li class="flex gap-3">
-                    <span class="font-bold text-pod-purple-light font-display">3.</span>
-                    <span>Вставьте URL выше и нажмите Send</span>
-                </li>
-                <li class="flex gap-3">
-                    <span class="font-bold text-pod-purple-light font-display">4.</span>
-                    <div>
-                        Проверьте логи:
-                        <div class="pod-code-block">docker compose logs app | grep webhook</div>
-                    </div>
-                </li>
-            </ol>
+        <div>
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-pod-text font-display">Live Feed</h2>
+                    <span id="feed-status" class="inline-flex items-center gap-1.5 text-xs text-green-400">
+                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        polling
+                    </span>
+                </div>
+                <div id="feed" class="space-y-3 max-h-[600px] overflow-y-auto">
+                    <p id="feed-empty" class="text-sm text-pod-text-dim text-center py-8">Ожидание вебхуков...</p>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        function getCurlOneline() {
+            const base = document.getElementById('tunnel-url').value.replace(/\/+$/, '') || 'https://YOUR-TUNNEL.trycloudflare.com';
+            return `curl -X POST ${base}/webhook/test -H "Content-Type: application/json" -d '{"name": "Ваше имя", "message": "Привет из зала!"}'`;
+        }
+
+        function copyCmd() {
+            const btn = document.getElementById('copy-btn');
+            navigator.clipboard.writeText(getCurlOneline());
+            btn.textContent = 'Copied!';
+            btn.classList.replace('bg-gray-700', 'bg-green-700');
+            setTimeout(() => { btn.textContent = 'Copy'; btn.classList.replace('bg-green-700', 'bg-gray-700'); }, 1500);
+        }
+
+        function updateCurl() {
+            const base = document.getElementById('tunnel-url').value.replace(/\/+$/, '') || 'https://YOUR-TUNNEL.trycloudflare.com';
+            document.getElementById('curl-cmd').textContent =
+                `curl -X POST ${base}/webhook/test \\\n  -H "Content-Type: application/json" \\\n  -d '{"name": "Ваше имя", "message": "Привет из зала!"}'`;
+        }
+        updateCurl();
+
+        const feedEl = document.getElementById('feed');
+        const emptyEl = document.getElementById('feed-empty');
+        let knownIds = new Set();
+
+        async function poll() {
+            try {
+                const res = await fetch('{{ path('webhook_feed') }}');
+                const items = await res.json();
+
+                if (items.length === 0) {
+                    emptyEl && (emptyEl.style.display = '');
+                    return;
+                }
+                emptyEl && (emptyEl.style.display = 'none');
+
+                items.forEach(item => {
+                    if (knownIds.has(item.id)) return;
+                    knownIds.add(item.id);
+
+                    const div = document.createElement('div');
+                    div.className = 'bg-pod-bg/50 border border-pod-border rounded-lg p-3 animate-fade-in';
+                    const payload = typeof item.payload === 'object' ? JSON.stringify(item.payload, null, 2) : item.payload;
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-pod-accent">${item.time}</span>
+                            <span class="text-xs text-pod-text-dim">${item.ip || ''}</span>
+                        </div>
+                        <pre class="text-xs text-pod-text font-mono whitespace-pre-wrap break-all">${escapeHtml(payload)}</pre>
+                        <div class="text-xs text-pod-text-dim mt-1 truncate">${escapeHtml(item.ua || '')}</div>
+                    `;
+                    feedEl.prepend(div);
+                });
+            } catch (e) { /* ignore */ }
+        }
+
+        function escapeHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        // Browser form: send via fetch, not redirect
+        document.getElementById('send-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('field-name').value || 'Anonymous';
+            const message = document.getElementById('field-message').value || 'Hello!';
+            const tunnelBase = document.getElementById('tunnel-url').value.replace(/\/+$/, '');
+            const postUrl = tunnelBase ? tunnelBase + '/webhook/test' : '{{ path('webhook_test') }}';
+            await fetch(postUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, message})
+            });
+            document.getElementById('field-name').value = '';
+            document.getElementById('field-message').value = '';
+        });
+
+        setInterval(poll, 2000);
+        poll();
+    </script>
+
+    <style>
+        @keyframes fade-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 0.3s ease-out; }
+    </style>
 {% endblock %}

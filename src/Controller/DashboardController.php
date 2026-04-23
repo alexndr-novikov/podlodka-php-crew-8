@@ -18,7 +18,7 @@ class DashboardController extends AbstractController
                 'route' => 'mail_index',
                 'icon' => "\u{1F4E7}",
                 'service' => 'Mailpit',
-                'serviceUrl' => 'https://mailpit.workshop.localhost:8443',
+                'serviceUrl' => 'https://mailpit.workshop.localhost',
             ],
             [
                 'title' => 'Хранилище (S3)',
@@ -26,7 +26,7 @@ class DashboardController extends AbstractController
                 'route' => 'storage_index',
                 'icon' => "\u{1F4E6}",
                 'service' => 'LocalStack',
-                'serviceUrl' => 'https://s3.workshop.localhost:8443',
+                'serviceUrl' => 'https://s3.workshop.localhost',
             ],
             [
                 'title' => 'Поиск',
@@ -34,7 +34,7 @@ class DashboardController extends AbstractController
                 'route' => 'search_index',
                 'icon' => "\u{1F50D}",
                 'service' => 'Meilisearch',
-                'serviceUrl' => 'https://search.workshop.localhost:8443',
+                'serviceUrl' => 'https://search.workshop.localhost',
             ],
             [
                 'title' => 'Кэш',

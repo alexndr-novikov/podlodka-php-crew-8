@@ -2,19 +2,24 @@
 
 namespace App\Controller;
 
-use App\Message\HandleWebhookPayload;
-use Psr\Log\LoggerInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/webhook')]
 class WebhookController extends AbstractController
 {
+    private const FEED_KEY = 'webhook_feed';
+    private const MAX_ITEMS = 50;
+
+    public function __construct(
+        private readonly CacheItemPoolInterface $cachePool,
+    ) {
+    }
+
     #[Route('', name: 'webhook_index')]
     public function index(): Response
     {
@@ -22,85 +27,42 @@ class WebhookController extends AbstractController
     }
 
     #[Route('/test', name: 'webhook_test', methods: ['POST'])]
-    public function test(Request $request, LoggerInterface $logger): JsonResponse
+    public function test(Request $request): JsonResponse
     {
-        $payload = json_decode($request->getContent(), true) ?? $request->request->all();
+        $content = $request->getContent();
+        $payload = $content ? (json_decode($content, true) ?: ['raw' => $content]) : $request->request->all();
 
-        $logger->info('Webhook received', [
-            'type' => 'test',
+        $entry = [
+            'id' => bin2hex(random_bytes(4)),
             'payload' => $payload,
-            'headers' => [
-                'content-type' => $request->headers->get('content-type'),
-                'user-agent' => $request->headers->get('user-agent'),
-            ],
-        ]);
+            'ip' => $request->getClientIp(),
+            'ua' => mb_substr((string) $request->headers->get('user-agent', ''), 0, 80),
+            'time' => (new \DateTimeImmutable())->format('H:i:s'),
+        ];
 
-        return new JsonResponse([
-            'status' => 'received',
-            'type' => 'test',
-            'payload' => $payload,
-            'received_at' => (new \DateTimeImmutable())->format('c'),
-        ]);
+        $item = $this->cachePool->getItem(self::FEED_KEY);
+        $feed = $item->isHit() ? $item->get() : [];
+        array_unshift($feed, $entry);
+        $feed = \array_slice($feed, 0, self::MAX_ITEMS);
+        $item->set($feed)->expiresAfter(3600);
+        $this->cachePool->save($item);
+
+        return new JsonResponse(['status' => 'ok', 'id' => $entry['id']]);
     }
 
-    #[Route('/stripe', name: 'webhook_stripe', methods: ['POST'])]
-    public function stripe(
-        Request $request,
-        LoggerInterface $logger,
-        MessageBusInterface $bus,
-    ): JsonResponse {
-        $payload = json_decode($request->getContent(), true);
+    #[Route('/feed', name: 'webhook_feed', methods: ['GET'])]
+    public function feed(): JsonResponse
+    {
+        $item = $this->cachePool->getItem(self::FEED_KEY);
+        $feed = $item->isHit() ? $item->get() : [];
 
-        if (!$payload || !isset($payload['type'])) {
-            return new JsonResponse(['error' => 'Invalid payload'], 400);
-        }
-
-        $logger->info('Stripe webhook received', [
-            'type' => $payload['type'],
-            'id' => $payload['id'] ?? null,
-        ]);
-
-        $bus->dispatch(new HandleWebhookPayload(
-            type: $payload['type'],
-            payload: $payload,
-        ));
-
-        return new JsonResponse([
-            'status' => 'accepted',
-            'type' => $payload['type'],
-        ]);
+        return new JsonResponse($feed);
     }
 
-    #[Route('/send-test', name: 'webhook_send_test', methods: ['POST'])]
-    public function sendTest(Request $request, HttpClientInterface $httpClient): Response
+    #[Route('/clear', name: 'webhook_clear', methods: ['POST'])]
+    public function clear(): Response
     {
-        $tunnelUrl = $request->request->get('tunnel_url', '');
-
-        if (!$tunnelUrl) {
-            $this->addFlash('error', 'Tunnel URL is required. Start tunnel first: make tunnel');
-            return $this->redirectToRoute('webhook_index');
-        }
-
-        try {
-            $response = $httpClient->request('POST', $tunnelUrl . '/webhook/test', [
-                'json' => [
-                    'event' => 'test.webhook',
-                    'data' => ['message' => 'Hello from tunnel roundtrip!'],
-                    'timestamp' => (new \DateTimeImmutable())->format('c'),
-                ],
-                'verify_peer' => false, // Local mkcert certs
-                'timeout' => 10,
-            ]);
-
-            $this->addFlash('success', sprintf(
-                'Webhook roundtrip OK! Status: %d, Response: %s',
-                $response->getStatusCode(),
-                $response->getContent(false),
-            ));
-        } catch (\Throwable $e) {
-            $this->addFlash('error', sprintf('Error: %s', $e->getMessage()));
-        }
-
+        $this->cachePool->deleteItem(self::FEED_KEY);
         return $this->redirectToRoute('webhook_index');
     }
 }

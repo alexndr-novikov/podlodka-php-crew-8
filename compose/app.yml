@@ -75,13 +75,9 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    labels: []
-    depends_on:
-      postgres:
-        condition: service_healthy
-      valkey:
-        condition: service_healthy
-    develop:
+    labels: !reset []
+    post_start: !reset []
+    develop: !reset
       watch: []
 
 volumes:

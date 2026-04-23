@@ -8,7 +8,6 @@ services:
       LOCALSTACK_ACKNOWLEDGE_ACCOUNT_REQUIREMENT: 1
     volumes:
       - localstack-data:/var/lib/localstack
-      - ../docker/localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh:ro
     networks:
       - workshop
     healthcheck:
@@ -16,6 +15,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    post_start:
+      - command: awslocal s3 mb s3://workshop-uploads
 
   s3manager:
     image: cloudlena/s3manager:latest

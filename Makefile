@@ -1,6 +1,6 @@
 .PHONY: help setup up down restart logs shell watch build \
         composer console migrate seed test \
-        debug tunnel tunnel-ngrok reset lint \
+        debug tunnel reset lint \
         slides slides-build slides-export slides-share
 
 .DEFAULT_GOAL := help
@@ -75,9 +75,6 @@ debug: ## Start with debug profile (Buggregator)
 
 tunnel: ## Start with tunnel profile (Cloudflare)
 	docker compose --profile tunnel up -d
-
-tunnel-ngrok: ## Start with ngrok tunnel
-	docker compose --profile tunnel-ngrok up -d
 
 # --- Maintenance ---
 

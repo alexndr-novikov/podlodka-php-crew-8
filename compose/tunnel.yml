@@ -1,6 +1,6 @@
 services:
   cloudflared:
-    image: cloudflare/cloudflared:2025.4.1
+    image: cloudflare/cloudflared:latest
     restart: unless-stopped
     command: tunnel --no-autoupdate --url http://app:8080
     networks:
@@ -9,23 +9,3 @@ services:
       - app
     profiles:
       - tunnel
-
-  ngrok:
-    image: ngrok/ngrok:3
-    restart: unless-stopped
-    command: http app:8080 --log stdout
-    environment:
-      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:-}
-    networks:
-      - workshop
-    depends_on:
-      - app
-    profiles:
-      - tunnel-ngrok
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ngrok.rule=Host(`ngrok.workshop.localhost`)"
-      - "traefik.http.routers.ngrok.entrypoints=websecure"
-      - "traefik.http.routers.ngrok.tls=true"
-      - "traefik.http.services.ngrok.loadbalancer.server.port=4040"
-
